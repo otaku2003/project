@@ -10,12 +10,22 @@ def login():
 class Package:
     def __init__(self,num,weight,destination,beginning):
 
-        conn = sq.connect("Packages.db")
+        conn = sq.connect("coldPackages.db")
         cur = conn.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS Packages (num int PRIMARY KEY, weight real, destination text, beginning text)''')
-        cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({num},{weight},'{destination}','{beginning}')''')
-        conn.commit()
-        conn.close()
+        if (cur.execute(f'''SELECT EXISTS(SELECT * FROM coldPackages WHERE num="{num}" )''' )):
+            print("this number exists in coldpackages")
+            
+        conn = sq.connect("breakablePackages.db")
+        cur = conn.cursor()
+        if (cur.execute(f'''SELECT EXISTS(SELECT * FROM breakablePackages WHERE num="{num}" )''')):
+            print("this number exixts in breakable packages ")
+        else:
+            conn = sq.connect("Packages.db")
+            cur = conn.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS Packages (num int PRIMARY KEY AUTOINCREMENT, weight real, destination text, beginning text)''')
+            cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({num},{weight},'{destination}','{beginning}')''')
+            conn.commit()
+            conn.close()
 
     def editPackage(self,num,weight = "",destination = "",beginning = ""):
         conn = sq.connect("Packages.db")
@@ -38,17 +48,28 @@ class Package:
         cur.execute(f'''DELETE from P   ackages WHERE num = {num}''')
         conn.commit()
         conn.close()
-   
+
+
    
     
 class coldPackage:
     def __init__(self,num,weight,destination,beginning,min_temperature,property = ""):
-        conn = sq.connect("coldPackages.db")
+        conn = sq.connect("Packages.db")
         cur = conn.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS coldPackages (num int PRIMARY KEY, weight real, destination text, beginning text,min_temperature int,property text )''')
-        cur.execute(f'''INSERT OR IGNORE INTO coldPackages VALUES ({num}, {weight}, '{destination}', '{beginning}',{min_temperature},'{property}' )''')
-        conn.commit()
-        conn.close()
+        if (cur.execute(f'''SELECT EXISTS(SELECT * FROM Packages WHERE num="{num}" )''' )):
+            print("this number exists in packages")
+            
+        conn = sq.connect("breakablePackages.db")
+        cur = conn.cursor()
+        if (cur.execute(f'''SELECT EXISTS(SELECT * FROM breakablePackages WHERE num="{num}" )''')):
+            print("this number exixts in breakable packages ")
+        else:
+            conn = sq.connect("coldPackages.db")
+            cur = conn.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS coldPackages (num int PRIMARY KEY AUTOINCREMENT, weight real, destination text, beginning text,min_temperature int,property text )''')
+            cur.execute(f'''INSERT OR IGNORE INTO coldPackages VALUES ({num}, {weight}, '{destination}', '{beginning}',{min_temperature},'{property}' )''')
+            conn.commit()
+            conn.close()
         
         
     def editcoldPackage(self,num,weight = "",destination = "",beginning = "",min_temperature = '',property = ''):
@@ -77,6 +98,7 @@ class coldPackage:
         cur.execute(f'''DELETE from codlPackages WHERE num = {num}''')
         conn.commit()
         conn.close()
+        
         
         
         
@@ -113,21 +135,21 @@ class breakablePackage():
             conn.commit()
             conn.close()
    
-  
+
   
     
     # packages in container has a problem
 class Container():
-    def __init__(self,num,max_weight,max_package,packeges_in_container):
+    def __init__(self,num,max_weight,max_package,packeges_in_container,property = ""):
         conn = sq.connect("Container.db")
         cur = conn.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY, max_weight real, max_packages int, packeges_in_container text)''')
-        cur.execute(f'''INSERT OR IGNORE INTO Container VALUES ({num},{max_weight},{max_package},'{packeges_in_container}')''')
+        cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY, max_weight real, max_package int, packeges_in_container text,property text)''')
+        cur.execute(f'''INSERT OR IGNORE INTO Container VALUES ({num},{max_weight},{max_package},'{packeges_in_container}','{property}')''')
         conn.commit()
         conn.close()
         
         
-    def editContainer(self,num,max_weight = "",max_package = "",packages_in_container = ""):
+    def editContainer(self,num,max_weight = "",max_package = "",packages_in_container = "",property = ''):
         conn = sq.connect("Container.db")
         cur = conn.cursor()
         if max_weight != "":
@@ -138,6 +160,9 @@ class Container():
              
         if packages_in_container != "":
             cur.execute(f'''UPDATE Container SET packages_in_container='{packages_in_container}' WHERE num = {num}''')     
+            
+        if packages_in_container != "":
+            cur.execute(f'''UPDATE Container SET property='{property}' WHERE num = {num}''')  
         conn.commit()
         conn.close() 
     
@@ -148,20 +173,21 @@ class Container():
         cur.execute(f'''DELETE from Container WHERE num = {num}''')
         conn.commit()
         conn.close()    
-    
+        
+
     
     
     
 class freezerContainer():
-    def __init__(self,num,max_weight,max_package,packeges_in_container,min_temp_produced_by_container):
+    def __init__(self,num,max_weight,max_package,packeges_in_container,min_temp_produced_by_container,property = ""):
         conn = sq.connect("freezerContainer.db")
         cur = conn.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS freezerContainer (num int PRIMARY KEY, max_weight real, max_packages int, packeges_in_container text,min_temp_produced_by_container int)''')
-        cur.execute(f'''INSERT OR IGNORE INTO freezerContainer VALUES ({num},{max_weight},{max_package},'{packeges_in_container}',{min_temp_produced_by_container})''')
+        cur.execute('''CREATE TABLE IF NOT EXISTS freezerContainer (num int PRIMARY KEY, max_weight real, max_packages int, packeges_in_container text,min_temp_produced_by_container int,property text)''')
+        cur.execute(f'''INSERT OR IGNORE INTO freezerContainer VALUES ({num},{max_weight},{max_package},'{packeges_in_container}',{min_temp_produced_by_container},'{property}')''')
         conn.commit()
         conn.close()
 
-    def editfreezerContainer(self,num,max_weight = "",max_package = "",packages_in_container = "",min_temp_produced_by_container = ''):
+    def editfreezerContainer(self,num,max_weight = "",max_package = "",packages_in_container = "",min_temp_produced_by_container = '',property = ''):
         conn = sq.connect("freezerContainer.db")
         cur = conn.cursor()
         if max_weight != "":
@@ -174,51 +200,292 @@ class freezerContainer():
             cur.execute(f'''UPDATE freezerContainer SET packages_in_container='{packages_in_container}' WHERE num = {num}''')   
             
         if min_temp_produced_by_container != "":
-            cur.execute(f'''UPDATE freezerContainer SET min_temp_produced_by_container='{min_temp_produced_by_container}' WHERE num = {num}''')                
+            cur.execute(f'''UPDATE freezerContainer SET min_temp_produced_by_container='{min_temp_produced_by_container}' WHERE num = {num}''') 
+                           
+        if property != "":
+            cur.execute(f'''UPDATE freezerContainer SET oroperty='{property}' WHERE num = {num}''') 
+
         conn.commit()
         conn.close() 
           
-
+    def removefreezerContainer(self,num):
+        conn = sq.connect("freezerContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from freezerContainer WHERE num = {num}''')
+        conn.commit()
+        conn.close()  
+        
+       
 
 class breakableContainer():
-    def __init__(self,max_speed_of_car,property = ''):
-        super().__init__()
-        self.max_speed_of_car = max_speed_of_car
-        self.property = property
-    
+    def __init__(self,num,max_weight,max_package,packeges_in_container,max_speed_of_car,property = ""):
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS breakableContainer (num int PRIMARY KEY, max_weight real, max_packages int, packeges_in_container text,max_speed_of_car int,property text)''')
+        cur.execute(f'''INSERT OR IGNORE INTO breakableContainer VALUES ({num},{max_weight},{max_package},'{packeges_in_container}',{max_speed_of_car},'{property}')''')
+        conn.commit()
+        conn.close()
+
+    def editbreakableContainer(self,num,max_weight = "",max_package = "",packages_in_container = "",max_speed_of_car = '',property = ''):
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()
+        if max_weight != "":
+            cur.execute(f'''UPDATE breakableContainer SET max_weight={max_weight} WHERE num = {num}''') 
+            
+        if max_package != "":
+            cur.execute(f'''UPDATE breakableContainer SET max_package='{max_package}' WHERE num = {num}''')
+             
+        if packages_in_container != "":
+            cur.execute(f'''UPDATE breakableContainer SET packages_in_container='{packages_in_container}' WHERE num = {num}''')     
+            
+        if packages_in_container != "":
+            cur.execute(f'''UPDATE breakableContainer SET property='{property}' WHERE num = {num}''')  
+            
+        if max_speed_of_car != '':
+            cur.execute(f'''UPDATE breakableContainer SET max_speed_of_car='{max_speed_of_car}' WHERE num = {num}''') 
+            
+        conn.commit()
+        conn.close() 
+        
+    def removebreakableContainer(self,num):
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from breakableContainer WHERE num = {num}''')
+        conn.commit()
+        conn.close()  
     
     
     
 class Car():
-    def __init__(self,number,max_weight):
-        self.number = number
-        self.max_weight = max_weight
+    def __init__(self,num,max_weight):
+        conn = sq.connect("Car.db")
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS Car (num int PRIMARY KEY, max_weight real)''')
+        cur.execute(f'''INSERT OR IGNORE INTO Car VALUES ({num},{max_weight})''')
+        conn.commit()
+        conn.close()
         
-    def addCar():
-        pass
     
-    def editCar():
-        pass
+    def editCar(self,num,max_weight_tolerable):
+        conn = sq.connect("Car.db")
+        cur = conn.cursor()
+        if max_weight_tolerable != "":
+            cur.execute(f'''UPDATE Car SET max_weight_tolerable={max_weight_tolerable} WHERE num = {num}''') 
+        conn.commit()
+        conn.close() 
     
-    def removeCar():
-        pass
+    def removeCar(self,num):
+        conn = sq.connect("Car.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from Car WHERE num = {num}''')
+        conn.commit()
+        conn.close() 
+        
         
 class carWithRoom():
-    def __init__(self,max_weight_tolerable,max_number_tolerable,property = ''):
-        super().__init__()
-        self.max_weight_tolerable = max_weight_tolerable
-        self.max_number_tolerable = max_number_tolerable
-        self.property = property
+    def __init__(self,num,max_weight_tolerable,max_number_tolerable,packages,property = ''):
+        conn = sq.connect("carWithRoom.db")
+        cur = conn.cursor()                                                                                          # list packages
+        cur.execute('''CREATE TABLE IF NOT EXISTS carWithRoom (num int PRIMARY KEY, max_weight_tolerable real,max_number_tolerable int,packages text,property text)''')
+        cur.execute(f'''INSERT OR IGNORE INTO carWithRoom VALUES ({num},{max_weight_tolerable},{max_number_tolerable},'{packages}',{max_number_tolerable},'{property}')''')
+        conn.commit()
+        conn.close()
+    
+    def editcarWithRoom(self,num,max_weight_tolerable='',max_number_tolerable = '',packages = '',property = ''):
+        conn = sq.connect("carWithRoom.db")
+        cur = conn.cursor()
+        if max_weight_tolerable != "":
+            cur.execute(f'''UPDATE carWithRoom SET max_weight_tolerable={max_weight_tolerable} WHERE num = {num}''') 
+            
+        if max_number_tolerable != "":
+            cur.execute(f'''UPDATE carWithRoom SET max_number_tolerable={max_number_tolerable} WHERE num = {num}''')
+                     
+        if packages != "":
+            cur.execute(f'''UPDATE carWithRoom SET packages={packages} WHERE num = {num}''')  
+                       
+        if property != "":
+            cur.execute(f'''UPDATE carWithRoom SET property={property} WHERE num = {num}''') 
+                                    
+        conn.commit()
+        conn.close()
+        
+    def removecarWithRoom(self,num):
+        conn = sq.connect("carWithRoom.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from carWithRoom WHERE num = {num}''')
+        conn.commit()
+        conn.close() 
         
         
 class containerCar():
-    def __init__(self,max_container_can_be_connected,property = ''):
-        super().__init__()
-        self.max_container_can_be_connected = max_container_can_be_connected
-        self.property = property
+    def __init__(self,num,max_weight_tolerable,max_container_can_be_connected,property = ''):
+        conn = sq.connect("containerCar.db")
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS containerCar (num int PRIMARY KEY, max_weight_tolerable real,max_container_can_be_connected int,property text)''')
+        cur.execute(f'''INSERT OR IGNORE INTO containerCar VALUES ({num},{max_weight_tolerable},{max_container_can_be_connected},'{property}')''')
+        conn.commit()
+        conn.close()
+        
+    def editcontainerCar(self,num,max_weight_tolerable = "",max_container_can_be_connected = '',property = ''):
+        conn = sq.connect("containerCar.db")
+        cur = conn.cursor()
+        if max_weight_tolerable != "":
+            cur.execute(f'''UPDATE containerCar SET max_weight_tolerable={max_weight_tolerable} WHERE num = {num}''') 
+            
+        if max_container_can_be_connected != "":
+            cur.execute(f'''UPDATE containerCar SET max-container_can_be_connedcted={max_container_can_be_connected} WHERE num = {num}''') 
+            
+        if property != "":
+            cur.execute(f'''UPDATE containerCar SET property={property} WHERE num = {num}''')                         
+        conn.commit()
+        conn.close() 
         
         
-x1 = breakablePackage(1,6,"hmd","tehran")
-x2 = coldPackage(2,3,"azar","canada",0)
-x3 = Package(4,9,"america","turkey")
-x4 = Container(3,1500,100,[x3,x2,x1])
+    def removecontainerCar(self,num):
+        conn = sq.connect("containerCar.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from containerCar WHERE num = {num}''')
+        conn.commit()
+        conn.close()         
+    
+def showallPackages():
+    conn = sq.connect('Packages.db')
+    cur = conn.cursor()
+    print("normal packages\nnumber - weight - destination - beginning") 
+    for row in cur.execute('''SELECT * FROM Packages '''):
+        print(row)
+        
+    conn = sq.connect('coldPackages.db')
+    cur = conn.cursor()
+    print("cold packages\n number - weight - destination - beginning - minimum tempreture - property") 
+    for row in cur.execute('''SELECT * FROM coldPackages '''):
+        print(row)   
+    
+    conn = sq.connect('breakablePackages.db')
+    cur = conn.cursor()
+    print("breakable packages\n number - weight - destination - beginning - property")
+    for row in cur.execute('''SELECT * FROM breakablePackages '''):
+        print(row)
+    
+def showallcontainers():
+    conn = sq.connect('container.db')
+    cur = conn.cursor()
+    print("normal container")
+    for row in cur.execute('''SELECT * FROM Container '''):
+        print(row)
+        
+    conn = sq.connect('freezercontainer.db')
+    cur = conn.cursor()
+    print('freezer containers')
+    for row in cur.execute('''SELECT * FROM freezerContainer '''):
+        print(row)
+         
+    conn = sq.connect('breakablecontainer.db')
+    cur = conn.cursor()        
+    for row in cur.execute('''SELECT * FROM breakableContainer '''):
+        print(row)  
+        
+        
+def showallCars():
+    conn = sq.connect("Car.db")     
+    cur = conn.cursor()    
+    print("normal cars")
+    for row in cur.execute('''SELECT * FROM Car '''):
+        print(row)
+        
+    conn = sq.connect("carWithRoom.db")     
+    cur = conn.cursor()    
+    print("cars with room")
+    for row in cur.execute('''SELECT * FROM carWithRoom '''):
+        print(row)
+    
+    conn = sq.connect("containerCar.db")     
+    cur = conn.cursor() 
+    print("container cars")
+    for row in cur.execute('''SELECT * FROM containerCar '''):
+        print(row)              
+
+# def addPackageToCantainer(p_num,c_num,type_package,type_container):##3 type : normal_cold_breakable
+#     conn = sq.connect("Container_Package.db")
+#     cur= conn.cursor()
+#     cur.execute('''CREATE TABLE IF NOT EXISTS Container_Package (num_package int PRIMARY KEY, num_container int PRIMARY KEY , type_package txt , type_container txt)''')
+#     cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({p_num},{c_num},{type_package},{type_container})''')
+#     conn.commit()
+#     conn.close()
+        
+def addPackageTocarWithRoom(p_num,c_num):
+    conn = sq.connect("carWithRoom_Package.db")
+    cur= conn.cursor()
+    cur.execute('''CREATE TABLE IF NOT EXISTS carWithRoom_Package (num_package int PRIMARY KEY,num_container int PRIMARY KEY)''')
+    cur.execute(f'''INSERT OR IGNORE INTO carWithRoom VALUES ({p_num},{c_num})''')
+    conn.commit()
+    conn.close()
+
+def addContainertoCar(container_num,car_num):
+    conn = sq.connect("contianer_car.db")## this
+    cur= conn.cursor()
+    cur.execute('''CREATE TABLE IF NOT EXISTS container_car (container_num int PRIMARY KEY,car_num int PRIMARY KEY)''')
+    cur.execute(f'''INSERT OR IGNORE INTO container_car VALUES ({container_num},{car_num})''')
+    conn.commit()
+    conn.close()
+
+
+def addPackageToCantainer(container_num):
+    conn = sq.connect("Container.db")
+    cur= conn.cursor()
+    if (cur.execute(f'''SELECT EXISTS(SELECT 1 FROM Container WHERE num="{container_num}")''')):
+        conn = sq.connect('Packages.db')
+        cur = conn.cursor()
+        print("normal packages\nnumber - weight - destination - beginning") 
+        for row in cur.execute('''SELECT * FROM Packages '''):
+            print(row)
+        package_num = int(input("Enter package number : "))
+        conn = sq.connect("Container_Package.db")
+        cur= conn.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS Container_Package (num_package int PRIMARY KEY, num_container int PRIMARY KEY , type_package txt , type_container txt)''')
+        cur.execute(f'''INSERT OR IGNORE INTO Container_Package VALUES ({package_num},{container_num},"normal","normal")''')
+        conn.commit()
+        conn.close()
+    
+    elif (cur.execute(f'''SELECT EXISTS(SELECT 1 FROM freezerContainer WHERE num="{container_num}")''')):
+        conn = sq.connect('coldPackages.db')
+        cur = conn.cursor()
+        print("cold packages\n number - weight - destination - beginning - minimum tempreture - property") 
+        for row in cur.execute('''SELECT * FROM coldPackages '''):
+            print(row) 
+        package_num = int(input("Enter package number : "))
+        conn = sq.connect("Container_Package.db")
+        cur= conn.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS Container_Package (num_package int PRIMARY KEY, num_container int PRIMARY KEY , type_package txt , type_container txt)''')
+        cur.execute(f'''INSERT OR IGNORE INTO Container_Package VALUES ({package_num},{container_num},"cold","freezer")''')
+        conn.commit()
+        conn.close()
+    
+    elif (cur.execute(f'''SELECT EXISTS(SELECT 1 FROM breakableContainer WHERE num="{container_num}")''')):
+        conn = sq.connect('breakablePackages.db')
+        cur = conn.cursor()
+        print("breakable packages\n number - weight - destination - beginning - property")
+        for row in cur.execute('''SELECT * FROM breakablePackages '''):
+            print(row)
+        package_num = int(input("Enter package number : "))
+        conn = sq.connect("Container_Package.db")
+        cur= conn.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS Container_Package (num_package int PRIMARY KEY, num_container int PRIMARY KEY , type_package txt , type_container txt)''')
+        cur.execute(f'''INSERT OR IGNORE INTO Container_Package VALUES ({package_num},{container_num},"normal","normal")''')
+        conn.commit()
+        conn.close()
+
+
+
+# x5 = Package(1,6,"hmd","tehran")
+# x1 = breakablePackage(1,6,"hmd","tehran")
+x2 = coldPackage(1,3,"azar","canada",0)
+# x3 = Package(4,9,"america","turkey")
+
+
+conn = sq.connect("Container_Package.db")
+cur= conn.cursor()
+cur.execute('''CREATE TABLE IF NOT EXISTS Container_Package (num_package int PRIMARY KEY, num_container int PRIMARY KEY , type_package txt , type_container txt)''')
+cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({package_num},{container_num},{type_package},{type_container})''')
+conn.commit()
+conn.close()
