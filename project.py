@@ -10,21 +10,27 @@ def login():
 class Package:
     def __init__(self,num,weight,destination,beginning):
         try:
-            conn = sq.connect("coldPackages.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM coldPackages WHERE num = ?", (num,))
-                data=cur.fetchone()
+            conn = sq.connect("Packages.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM Packages WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
-                print("this number exists in coldpackages")
+                print('this number exists in Packages')
+        except:pass        
+        
+        try:
+            conn = sq.connect("coldPackages.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM coldPackages WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print('this number exists in coldpackages')
         except:pass
-    
         try:    
             conn = sq.connect("breakablePackages.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM breakablePackages WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM breakablePackages WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in  breakable packages")
         except:pass    
@@ -65,21 +71,27 @@ class Package:
 class coldPackage:
     def __init__(self,num,weight,destination,beginning,min_temperature,property = ""):
         try:
+            conn = sq.connect("coldPackages.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM coldPackages WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print('this number exists in coldpackages')
+        except:pass        
+        try:
             conn = sq.connect("Packages.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM Packages WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM Packages WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in packages")
         except:pass
         
         try:    
             conn = sq.connect("breakablePackages.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM breakablePackages WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM breakablePackages WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in breakable packages")
         except:pass
@@ -125,22 +137,29 @@ class coldPackage:
         
 class breakablePackage():
         def __init__(self,num,weight,destination,beginning,property = ""):
+            try:    
+                conn = sq.connect("breakablePackages.db")
+                cur = conn.cursor()    
+                cur.execute(f'SELECT 1 FROM breakablePackages WHERE num={num} ')
+                data = cur.fetchone()
+                if data is not None:
+                    print("this number exists in breakable packages")
+            except:pass
+                
             try:
                 conn = sq.connect("coldPackages.db")
-                cur = conn.cursor()
-                for num in (f'{num}'): 
-                    cur.execute(f"SELECT {num} FROM coldPackages WHERE num = ?", (num,))
-                    data=cur.fetchone()
+                cur = conn.cursor()    
+                cur.execute(f'SELECT 1 FROM coldPackages WHERE num={num} ')
+                data = cur.fetchone()
                 if data is not None:
                     print("this number exists in cold packages")
             except:pass
 
             try:
                 conn = sq.connect("Packages.db")
-                cur = conn.cursor()
-                for num in (f'{num}'): 
-                    cur.execute(f"SELECT {num} FROM Packages WHERE num = ?", (num,))
-                    data=cur.fetchone()
+                cur = conn.cursor()    
+                cur.execute(f'SELECT 1 FROM Packages WHERE num={num} ')
+                data = cur.fetchone()
                 if data is not None:
                     print("this number exists in  packages") 
             except:pass
@@ -184,21 +203,27 @@ class breakablePackage():
 class Container():
     def __init__(self,num,max_weight,max_package,number_of_packages =0,weight = 0,property = ""):
         try:
+            conn = sq.connect("Container.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM Container WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print("this number exists in Container")
+        except:pass        
+        try:
             conn = sq.connect("freezerContainer.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM freezerContainer WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM freezerContainer WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in freezer containers")
         except:pass
         
         try:    
             conn = sq.connect("breakableContainer.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM breakableContainer WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM breakableContainer WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in breakable Container")
         except:pass
@@ -241,21 +266,27 @@ class Container():
 class freezerContainer():
     def __init__(self,num,max_weight,max_package,min_temp_produced_by_container,number_of_packages=0,weight=0,property = ""):
         try:
+            conn = sq.connect("freezerContainer.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM freezerContainer WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print("this number exists in freezer containers")
+        except:pass        
+        try:
             conn = sq.connect("Container.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM Container WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM Container WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in Container")
         except:pass
         
         try:    
             conn = sq.connect("breakableContainer.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM breakableContainer WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM breakableContainer WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in breakable Containers")
         except:pass
@@ -298,22 +329,28 @@ class freezerContainer():
 
 class breakableContainer():
     def __init__(self,num,max_weight,max_package,max_speed_of_car,number_of_packages = 0,weight = 0,property = ""):
+        try:    
+            conn = sq.connect("breakableContainer.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM breakableContainer WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print("this number exists in breakable Containers")
+        except:pass        
         try:
             conn = sq.connect("Container.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM Container WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM Container WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in Container")
         except:pass
         
         try:    
             conn = sq.connect("freezerContainer.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM freezerContainer WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM freezerContainer WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in freezer container")
         except:pass
@@ -357,22 +394,29 @@ class breakableContainer():
         
 class carWithRoom():
     def __init__(self,num,max_weight,max_package,number_of_packages = 0,weight = 0,property = ''):
-        
+        try:        
+            conn = sq.connect("carWithRoom.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM carWithRoom WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print("this number exists in cars with room")                
+        except:pass        
+        try:
             conn = sq.connect("containerCar.db")
-            cur = conn.cursor()
-            for num in (f'{num}'): 
-                cur.execute(f"SELECT {num} FROM containerCar WHERE num = ?", (num,))
-                data=cur.fetchone()
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM containerCar WHERE num={num} ')
+            data = cur.fetchone()
             if data is not None:
                 print("this number exists in container Cars")
-          
-            else:
-                conn = sq.connect("carWithRoom.db")
-                cur = conn.cursor()                                                                                         
-                cur.execute('''CREATE TABLE IF NOT EXISTS carWithRoom (num int PRIMARY KEY, max_weight real,max_package int,number_of_packages int,weight real,property text)''')
-                cur.execute(f'''INSERT OR IGNORE INTO carWithRoom VALUES ({num},{max_weight},{max_package},{number_of_packages},{weight},'{property}')''')
-                conn.commit()
-                conn.close()
+        except:pass  
+        else:
+            conn = sq.connect("carWithRoom.db")
+            cur = conn.cursor()                                                                                         
+            cur.execute('''CREATE TABLE IF NOT EXISTS carWithRoom (num int PRIMARY KEY, max_weight real,max_package int,number_of_packages int,weight real,property text)''')
+            cur.execute(f'''INSERT OR IGNORE INTO carWithRoom VALUES ({num},{max_weight},{max_package},{number_of_packages},{weight},'{property}')''')
+            conn.commit()
+            conn.close()
         
     def editcarWithRoom(self,num,max_weight_tolerable='',max_number_tolerable = '',property = ''):
         conn = sq.connect("carWithRoom.db")
@@ -400,15 +444,22 @@ class carWithRoom():
         
 class containerCar():
     def __init__(self,num,max_weight,max_container_can_be_connected,number_of_containers = 0,weight = 0,property = ''):
-        
-        conn = sq.connect("carWithRoom.db")
-        cur = conn.cursor()
-        for num in (f'{num}'): 
-            cur.execute(f"SELECT {num} FROM carWithRoom WHERE num = ?", (num,))
-            data=cur.fetchone()
-        if data is not None:
-            print("this number exists in cars with room")                
-        
+        try:
+            conn = sq.connect("containerCar.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM containerCar WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print("this number exists in container Cars")
+        except:pass  
+        try:        
+            conn = sq.connect("carWithRoom.db")
+            cur = conn.cursor()    
+            cur.execute(f'SELECT 1 FROM carWithRoom WHERE num={num} ')
+            data = cur.fetchone()
+            if data is not None:
+                print("this number exists in cars with room")                
+        except:pass
         else:
             conn = sq.connect("containerCar.db")
             cur = conn.cursor()
@@ -439,7 +490,7 @@ class containerCar():
         conn.commit()
         conn.close()         
     
-def showallPackages():
+def showallPackages(): 
     conn = sq.connect('Packages.db')
     cur = conn.cursor()
     print("normal packages\nnumber - weight - destination - beginning") 
@@ -461,49 +512,42 @@ def showallPackages():
 def showallcontainers():
     conn = sq.connect('container.db')
     cur = conn.cursor()
-    print("normal container")
+    print("normal container\n number - max_waight - max_package - current number of packages in container - current weight - property")
     for row in cur.execute('''SELECT * FROM Container '''):
         print(row)
         
     conn = sq.connect('freezercontainer.db')
     cur = conn.cursor()
-    print('freezer containers')
+    print('freezer containers\n number - max_weight - max_package - min temperature container can produce - current number of packages in container - weight - property')
     for row in cur.execute('''SELECT * FROM freezerContainer '''):
         print(row)
          
     conn = sq.connect('breakablecontainer.db')
-    cur = conn.cursor()        
+    cur = conn.cursor() 
+    print("breakable container\n number - max_weight - max_package _ max_speed - current number of packages in container - weight - property")       
     for row in cur.execute('''SELECT * FROM breakableContainer '''):
         print(row)  
         
         
 def showallCars():
-    conn = sq.connect("Car.db")     
-    cur = conn.cursor()    
-    print("normal cars")
-    for row in cur.execute('''SELECT * FROM Car '''):
-        print(row)
-        
     conn = sq.connect("carWithRoom.db")     
     cur = conn.cursor()    
-    print("cars with room")
+    print("cars with room\n number - max_weight - max_package _ current number of packages - weight - peoperty ")
     for row in cur.execute('''SELECT * FROM carWithRoom '''):
         print(row)
     
     conn = sq.connect("containerCar.db")     
     cur = conn.cursor() 
-    print("container cars")
+    print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ")
     for row in cur.execute('''SELECT * FROM containerCar '''):
         print(row)              
 
         
-def addPackageTocarWithRoom(car_num):#need debug
+def addPackageTocarWithRoom(car_num):
     conn = sq.connect("carWithRoom.db")
-    cur = conn.cursor()
-    
-    for car_num in (f'{car_num}'):
-        cur.execute(f"SELECT {car_num} FROM carWithRoom WHERE num = ?", (car_num,))
-        data=cur.fetchone()
+    cur = conn.cursor()   
+    cur.execute(f'SELECT 1 FROM carWithRoom WHERE num={car_num} ')
+    data = cur.fetchone()
     if data is None:
         print('container car doesnt exist')
     else:
@@ -539,120 +583,238 @@ def addPackageTocarWithRoom(car_num):#need debug
                 for row in cur.execute('''SELECT * FROM Packages '''):
                     print(row)
                     
+                input_string = input("enter numbers seperated by space :")
+                package_num_list = input_string.split()
+                for i in range(len(package_num_list)):
+                    package_num_list[i] = int(package_num_list[i])
                 
-                package_num = int(input("Enter package number : "))
-                try:
-                    conn = sq.connect("Container_Packages.db")
-                    cur = conn.cursor()
-                    for package_num in (f'{package_num}'): 
-                        cur.execute(f"SELECT {package_num} FROM Container_packages WHERE num_package = ?", (package_num,))
-                        data=cur.fetchone()
-                    if data is not None:
-                        print("package is already exist in a container")
-                except:pass    
-                
-                
-                else:
-                    
-                    conn = sq.connect("Car_Packages.db")
-                    cur = conn.cursor()
-                    for package_num in (f'{package_num}'): 
-                        cur.execute(f"SELECT {package_num} FROM Car_packages WHERE num_package = ?", (package_num,))
-                        data=cur.fetchone()
-                    if data is not None:
-                        print("package is already exist in a car with room")
-                    
+                for package_num in package_num_list:
+                    try:
+                        conn = sq.connect("Container_Packages.db")
+                        cur = conn.cursor()    
+                        cur.execute(f'SELECT 1 FROM Container_Packages WHERE num={package_num} ')
+                        data = cur.fetchone()
+                        if data is not None:
+                            print(f"package {package_num} is already exist in a container")
+                    except:pass    
+
+
                     else:
-                    
-                        conn = sq.connect("Packages.db")
-                        cur = conn.cursor()
-                        cur.execute(f'''SELECT weight FROM Packages WHERE num = {package_num} ''')
-                        for row in cur:
-                            package_weight = row
-                        if Car_weight[0] + package_weight[0] > max_car_weight[0]:
-                            print("By adding this package, the weight of the container exceeds its limit")    
+
+                        conn = sq.connect("Car_Packages.db")
+                        cur = conn.cursor()    
+                        cur.execute(f'SELECT 1 FROM Car_Packages WHERE num={package_num} ')
+                        data = cur.fetchone()
+                        if data is not None:
+                            print(f"package {package_num} is already exist in a car with room")
+
                         else:
-                            conn = sq.connect("carWithRoom.db")
-                            cur = conn.cursor() 
-                            cur.execute(f'''UPDATE carWithRoom SET weight ={Car_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_car_with_room[0]+1} WHERE num={car_num}''')
-                            conn.commit()
-                            conn.close()
-                            conn = sq.connect("Car_Packages.db")
+                        
+                            conn = sq.connect("Packages.db")
                             cur = conn.cursor()
-                            cur.execute('''CREATE TABLE IF NOT EXISTS Car_Packages (num_package int PRIMARY KEY , num_carWithRoom int, type_Package text, type_carWithRoom text)''')
-                            cur.execute(f'''INSERT OR IGNORE INTO Car_Packages VALUES ({package_num},{car_num},'normal','normal')''')
-                            conn.commit()
-                            conn.close()                  
+                            cur.execute(f'''SELECT weight FROM Packages WHERE num = {package_num} ''')
+                            for row in cur:
+                                package_weight = row
+                            if Car_weight[0] + package_weight[0] > max_car_weight[0]:
+                                print("By adding this package, the weight of the container exceeds its limit")    
+                            else:
+                                conn = sq.connect("carWithRoom.db")
+                                cur = conn.cursor() 
+                                cur.execute(f'''UPDATE carWithRoom SET weight ={Car_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_car_with_room[0]+1} WHERE num={car_num}''')
+                                conn.commit()
+                                conn.close()
+                                conn = sq.connect("Car_Packages.db")
+                                cur = conn.cursor()
+                                cur.execute('''CREATE TABLE IF NOT EXISTS Car_Packages (num_package int PRIMARY KEY , num_carWithRoom int, type_Package text, type_carWithRoom text)''')
+                                cur.execute(f'''INSERT OR IGNORE INTO Car_Packages VALUES ({package_num},{car_num},'normal','normal')''')
+                                conn.commit()
+                                conn.close()                  
 
 
 def addContainertoCar(container_num):
-    conn = sq.connect("Car_Packages.db")
-    cur = conn.cursor()
-    for container_num in (f'{container_num}'): 
-        cur.execute(f"SELECT {container_num} FROM Car_Packages WHERE num_package = ?", (container_num,))
-        data=cur.fetchone()
-    if data is not None:
-        print("Container is already connected in another car")
-    else:
+    
+    # conn = sq.connect("containerCar_Container.db")
+    # cur = conn.cursor()   
+    # cur.execute(f'SELECT 1 FROM containerCar_Container WHERE num={container_num} ')
+    # data = cur.fetchone()
+    # if data is not None:
+    #     print("Container is already connected in another car")
+    # else:
     
         conn = sq.connect("Container.db")
-        cur = conn.cursor()
-        for container_num in (f'{container_num}'): 
-            cur.execute(f"SELECT {container_num} FROM Container WHERE num = ?", (container_num,))
-            data=cur.fetchone()
+        cur = conn.cursor()   
+        cur.execute(f'SELECT 1 FROM Container WHERE num={container_num} ')
+        data = cur.fetchone()
         if data is not None:
+            
             cur.execute(f'''SELECT weight FROM Container WHERE num = {container_num}''')
             for row in cur:
                 container_weight = row
             
             conn = sq.connect("containerCar.db")
             cur = conn.cursor() 
-            print("container cars\nnumber - max weight - max container can be connected - number of containers - weight - peoperty ") 
+            print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ") 
             for row in cur.execute(f"SELECT * FROM containerCar "):
                 print(row)     
                 
-            containerCar_num = int(input("Enter Container car number : "))  
+                
+            input_string = input("enter numbers seperated by space :")
+            containerCar_num_list = input_string.split()
+            for i in range(len(containerCar_num_list)):
+                containerCar_num_list[i] = int(containerCar_num_list[i])                
             
-            cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containerCar_num}''')  
-            for row in cur:
-                containerCar_weight = row    
+            for containerCar_num in containerCar_num_list: 
             
-            cur.execute(f'''SELECT max_weight FROM containerCar WHERE num = {containerCar_num}''') 
-            for row in cur:
-                max_weight_containerCar = row   
-        
-            if(max_weight_containerCar[0]< containerCar_weight[0]+container_weight[0]):
-                print("By adding this container, the weight of the container car exceeds its limit")
-
-            else:
-                cur.execute(f'''SELECT number_of_containers FROM containerCar WHERE num = {containerCar_num}''')
+                cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containerCar_num}''')  
                 for row in cur:
-                    number_of_containers_in_car = row
-                    
-                cur.execute(f'''SELECT max_container_can_be_connected FROM containerCar WHERE num = {containerCar_num}''')
-                for row in cur:
-                    max_number_of_container_in_car = row
+                    containerCar_weight = row    
 
-                if(number_of_containers_in_car>=max_number_of_container_in_car):
-                    print("The capacity of the vehicle for the container is complete")
+                cur.execute(f'''SELECT max_weight FROM containerCar WHERE num = {containerCar_num}''') 
+                for row in cur:
+                    max_weight_containerCar = row   
+
+                if(max_weight_containerCar[0]< containerCar_weight[0]+container_weight[0]):
+                    print(f"By adding  container {containerCar_num}, the weight of the container car exceeds its limit")
 
                 else:
-                    conn = sq.connect("contaeinerCar_Container.db")
-                    cur = conn.cursor()
-   
-                    cur.execute('''CREATE TABLE IF NOT EXISTS container_car (Container_num int PRIMARY KEY,containerCar_num int )''')
-                    cur.execute(f'''INSERT OR IGNORE INTO container_car VALUES ({container_num},{containerCar_num})''')
-                    conn.commit()
-                    conn.close()
+                    cur.execute(f'''SELECT number_of_containers FROM containerCar WHERE num = {containerCar_num}''')
+                    for row in cur:
+                        number_of_containers_in_car = row
 
+                    cur.execute(f'''SELECT max_container_can_be_connected FROM containerCar WHERE num = {containerCar_num}''')
+                    for row in cur:
+                        max_number_of_container_in_car = row
 
+                    if(number_of_containers_in_car>=max_number_of_container_in_car):
+                        print(f"The capacity of the vehicle for the container {containerCar_num} is complete")
+
+                    else:
+                        conn = sq.connect("containerCar_Container.db")
+                        cur = conn.cursor()
+    
+                        cur.execute('''CREATE TABLE IF NOT EXISTS containerCar_Container (Container_num int PRIMARY KEY,containerCar_num int ,type_container)''')
+                        cur.execute(f'''INSERT OR IGNORE INTO containerCar_Container VALUES ({container_num},{containerCar_num},'normal')''')
+                        conn.commit()
+                        conn.close()
+                        
+        conn = sq.connect("freezerContainer.db")
+        cur = conn.cursor()   
+        cur.execute(f'SELECT 1 FROM freezerContainer WHERE num={container_num} ')
+        data = cur.fetchone()
+        if data is not None:
+            cur.execute(f'''SELECT weight FROM freezerContainer WHERE num = {container_num}''')
+            for row in cur:
+                container_weight = row
+            
+            conn = sq.connect("containerCar.db")
+            cur = conn.cursor() 
+            print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ") 
+            for row in cur.execute(f"SELECT * FROM containerCar "):
+                print(row)     
+                
+            input_string = input("enter numbers seperated by space :")
+            containerCar_num_list = input_string.split()
+            for i in range(len(containerCar_num_list)):
+                containerCar_num_list[i] = int(containerCar_num_list[i])                
+            
+            for containerCar_num in containerCar_num_list:                
+            
+            
+                cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containerCar_num}''')  
+                for row in cur:
+                    containerCar_weight = row    
+
+                cur.execute(f'''SELECT max_weight FROM containerCar WHERE num = {containerCar_num}''') 
+                for row in cur:
+                    max_weight_containerCar = row   
+
+                if(max_weight_containerCar[0]< containerCar_weight[0]+container_weight[0]):
+                    print(f"By adding container{containerCar_num}, the weight of the container car exceeds its limit")
+
+                else:
+                    cur.execute(f'''SELECT number_of_containers FROM containerCar WHERE num = {containerCar_num}''')
+                    for row in cur:
+                        number_of_containers_in_car = row
+
+                    cur.execute(f'''SELECT max_container_can_be_connected FROM containerCar WHERE num = {containerCar_num}''')
+                    for row in cur:
+                        max_number_of_container_in_car = row
+
+                    if(number_of_containers_in_car>=max_number_of_container_in_car):
+                        print(f"The capacity of the vehicle for the container {containerCar_num} is complete")
+
+                    else:
+                        conn = sq.connect("contaeinerCar_Container.db")
+                        cur = conn.cursor()
+    
+                        cur.execute('''CREATE TABLE IF NOT EXISTS container_car (Container_num int PRIMARY KEY,containerCar_num int ,type_container)''')
+                        cur.execute(f'''INSERT OR IGNORE INTO container_car VALUES ({container_num},{containerCar_num},'cold')''')
+                        conn.commit()
+                        conn.close()
+                    
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()   
+        cur.execute(f'SELECT 1 FROM breakableContainer WHERE num={container_num} ')
+        data = cur.fetchone()
+        if data is not None:
+            cur.execute(f'''SELECT weight FROM breakableContainer WHERE num = {container_num}''')
+            for row in cur:
+                container_weight = row
+            
+            conn = sq.connect("containerCar.db")
+            cur = conn.cursor() 
+            print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ") 
+            for row in cur.execute(f"SELECT * FROM containerCar "):
+                print(row)     
+            
+            input_string = input("enter numbers seperated by space :")
+            containerCar_num_list = input_string.split()
+            for i in range(len(containerCar_num_list)):
+                containerCar_num_list[i] = int(containerCar_num_list[i])                
+            
+            for containerCar_num in containerCar_num_list:                
+ 
+            
+                cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containerCar_num}''')  
+                for row in cur:
+                    containerCar_weight = row    
+
+                cur.execute(f'''SELECT max_weight FROM containerCar WHERE num = {containerCar_num}''') 
+                for row in cur:
+                    max_weight_containerCar = row   
+
+                if(max_weight_containerCar[0]< containerCar_weight[0]+container_weight[0]):
+                    print(f"By adding  container {containerCar_num}, the weight of the container car exceeds its limit")
+
+                else:
+                    cur.execute(f'''SELECT number_of_containers FROM containerCar WHERE num = {containerCar_num}''')
+                    for row in cur:
+                        number_of_containers_in_car = row
+
+                    cur.execute(f'''SELECT max_container_can_be_connected FROM containerCar WHERE num = {containerCar_num}''')
+                    for row in cur:
+                        max_number_of_container_in_car = row
+
+                    if(number_of_containers_in_car>=max_number_of_container_in_car):
+                        print(f"The capacity of the vehicle for the container {containerCar_num} is complete")
+
+                    else:
+                        conn = sq.connect("contaeinerCar_Container.db")
+                        cur = conn.cursor()
+    
+                        cur.execute('''CREATE TABLE IF NOT EXISTS container_car (Container_num int PRIMARY KEY,containerCar_num int ,type_container)''')
+                        cur.execute(f'''INSERT OR IGNORE INTO container_car VALUES ({container_num},{containerCar_num},'breakable')''')
+                        conn.commit()
+                        conn.close()
+        
+        
+                   
 def addPackageToCantainer(container_num):
     
     conn = sq.connect("Container.db")
-    cur = conn.cursor()
-    for container_num in (f'{container_num}'): 
-        cur.execute(f"SELECT {container_num} FROM Container WHERE num = ?", (container_num,))
-        data=cur.fetchone()
+    cur = conn.cursor()   
+    cur.execute(f'SELECT 1 FROM Container WHERE num={container_num} ')
+    data = cur.fetchone()
     if data is not None:
         conn = sq.connect("Container.db")
         cur = conn.cursor()
@@ -682,64 +844,68 @@ def addPackageToCantainer(container_num):
                 for row in cur.execute('''SELECT * FROM Packages '''):
                     print(row)
                     
+                input_string = input("enter numbers seperated by space :")
+                package_num_list = input_string.split()
+                for i in range(len(package_num_list)):
+                    package_num_list[i] = int(package_num_list[i])
                 
-                package_num = int(input("Enter package number : "))
+                for package_num in package_num_list:                    
                 
-                conn = sq.connect("Container_Packages.db")
-                cur = conn.cursor()
-                for package_num in (f'{package_num}'): 
-                    cur.execute(f"SELECT {package_num} FROM Container_packages WHERE num_package = ?", (package_num,))
-                    data=cur.fetchone()
-                if data is not None:
-                    print("package is already exist in a container")
                 
-                else:
-                    conn = sq.connect("Car_Packages.db")
+                    conn = sq.connect("Container_Packages.db")
                     cur = conn.cursor()
                     for package_num in (f'{package_num}'): 
-                        cur.execute(f"SELECT {package_num} FROM Car_packages WHERE num_package = ?", (package_num,))
+                        cur.execute(f"SELECT {package_num} FROM Container_packages WHERE num_package = ?", (package_num,))
                         data=cur.fetchone()
                     if data is not None:
-                        print("package is already exist in a car with room")
-                    
+                        print(f"package {package_num} is already exist in a container")
+
                     else:
-                    
-                        conn = sq.connect("Packages.db")
+                        conn = sq.connect("Car_Packages.db")
                         cur = conn.cursor()
-                        cur.execute(f'''SELECT weight FROM Packages WHERE num = {package_num} ''')
-                        for row in cur:
-                            package_weight = row
-
-
-                        if Container_weight[0] + package_weight[0] > max_container_weight[0]:
-                            print("By adding this package, the weight of the container exceeds its limit")    
-
+                        for package_num in (f'{package_num}'): 
+                            cur.execute(f"SELECT {package_num} FROM Car_packages WHERE num_package = ?", (package_num,))
+                            data=cur.fetchone()
+                        if data is not None:
+                            print(f"package {package_num} is already exist in a car with room")
 
                         else:
-                            conn = sq.connect("Container.db")
-                            cur = conn.cursor() 
-
-                            cur.execute(f'''UPDATE Container SET weight ={Container_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_container[0]+1} WHERE num={container_num}''')
-                            conn.commit()
-                            conn.close()
-
-                            conn = sq.connect("Container_Package.db")
+                        
+                            conn = sq.connect("Packages.db")
                             cur = conn.cursor()
+                            cur.execute(f'''SELECT weight FROM Packages WHERE num = {package_num} ''')
+                            for row in cur:
+                                package_weight = row
 
-                            cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
-                            cur.execute(f'''INSERT OR IGNORE INTO Container_Packages VALUES ({package_num},{container_num},'normal','normal')''')
 
-                            conn.commit()
-                            conn.close()
+                            if Container_weight[0] + package_weight[0] > max_container_weight[0]:
+                                print(f"By adding  package {package_num}, the weight of the container exceeds its limit")    
+
+
+                            else:
+                                conn = sq.connect("Container.db")
+                                cur = conn.cursor() 
+
+                                cur.execute(f'''UPDATE Container SET weight ={Container_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_container[0]+1} WHERE num={container_num}''')
+                                conn.commit()
+                                conn.close()
+
+                                conn = sq.connect("Container_Package.db")
+                                cur = conn.cursor()
+
+                                cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
+                                cur.execute(f'''INSERT OR IGNORE INTO Container_Packages VALUES ({package_num},{container_num},'normal','normal')''')
+
+                                conn.commit()
+                                conn.close()
 
     
     # #############################
     
     conn = sq.connect("freezerContainer.db")
-    cur = conn.cursor()
-    for container_num in (f'{container_num}'): 
-        cur.execute(f"SELECT {container_num} FROM freezerContainer WHERE num = ?", (container_num,))
-        data=cur.fetchone()
+    cur = conn.cursor()   
+    cur.execute(f'SELECT 1 FROM freezerContainer WHERE num={container_num} ')
+    data = cur.fetchone()
     if data is not None:
         conn = sq.connect("freezerContainer.db")
         cur = conn.cursor()
@@ -768,78 +934,80 @@ def addPackageToCantainer(container_num):
                 for row in cur.execute('''SELECT * FROM coldPackages '''):
                     print(row) 
                     
+                input_string = input("enter numbers seperated by space :")
+                package_num_list = input_string.split()
+                for i in range(len(package_num_list)):
+                    package_num_list[i] = int(package_num_list[i])
                 
-                package_num = int(input("Enter package number : "))
-                conn = sq.connect("Container_Packages.db")
-                cur = conn.cursor()
-                for package_num in (f'{package_num}'): 
-                    cur.execute(f"SELECT {package_num} FROM Container_packages WHERE num_package = ?", (package_num,))
-                    data=cur.fetchone()
-                if data is not None:
-                    print("package is already exist in a container")
+                for package_num in package_num_list:                
                 
-                else:
-                    conn = sq.connect("Car_Packages.db")
-                    cur = conn.cursor()
-                    for package_num in (f'{package_num}'): 
-                        cur.execute(f"SELECT {package_num} FROM Car_packages WHERE num_package = ?", (package_num,))
-                        data=cur.fetchone()
+                    conn = sq.connect("Container_Packages.db")
+                    cur = conn.cursor()   
+                    cur.execute(f'SELECT 1 FROM Container_Packages WHERE num={package_num} ')
+                    data = cur.fetchone()
                     if data is not None:
-                        print("package is already exist in a car with room")
+                        print(f"package {package_num} is already exist in a container")
 
                     else:
-                        conn = sq.connect("coldPackages.db")
-                        cur = conn.cursor()
-                        cur.execute(f'''SELECT weight FROM coldPackages WHERE num = {package_num} ''')
-                        for row in cur:
-                            package_weight = row
-
-
-                        if Container_weight[0] + package_weight[0] > max_container_weight[0]:
-                            print("By adding this package, the weight of the freezer container exceeds its limit")    
-
+                        conn = sq.connect("Car_Packages.db")
+                        cur = conn.cursor()   
+                        cur.execute(f'SELECT 1 FROM Car_Packages WHERE num={package_num} ')
+                        data = cur.fetchone()
+                        if data is not None:
+                            print(f"package {package_num} is already exist in a car with room")
 
                         else:
-                            
-                            conn = sq.connect("freezerContainer.db")
-                            cur = conn.cursor()
-                            cur.execute(f'''SELECT min_temp_produced_by_container FROM coldPackages WHERE num = {container_num} ''')
-                            for row in cur:
-                                min_temp_container = row
-                                
                             conn = sq.connect("coldPackages.db")
                             cur = conn.cursor()
-                            cur.execute(f'''SELECT min_temperature FROM coldPackages WHERE num = {package_num} ''')
+                            cur.execute(f'''SELECT weight FROM coldPackages WHERE num = {package_num} ''')
                             for row in cur:
-                                min_temp_package = row
-                            
-                            if(min_temp_container[0]>min_temp_package[0]):
-                                print("The package will be spoiled in this container")
-                            
+                                package_weight = row
+
+
+                            if Container_weight[0] + package_weight[0] > max_container_weight[0]:
+                                print(f"By adding package {package_num}, the weight of the freezer container exceeds its limit")    
+
+
                             else:
-                            
+
                                 conn = sq.connect("freezerContainer.db")
-                                cur = conn.cursor() 
-
-                                cur.execute(f'''UPDATE freezerContainer SET weight ={Container_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_container[0]+1} WHERE num={container_num}''')
-                                conn.commit()
-                                conn.close()
-
-                                conn = sq.connect("Container_Packages.db")
                                 cur = conn.cursor()
-                                cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
-                                cur.execute(f'''INSERT OR IGNORE INTO Container_Packages VALUES ({package_num},{container_num},'cold','cold')''')
+                                cur.execute(f'''SELECT min_temp_produced_by_container FROM coldPackages WHERE num = {container_num} ''')
+                                for row in cur:
+                                    min_temp_container = row
 
-                                conn.commit()
-                                conn.close()
+                                conn = sq.connect("coldPackages.db")
+                                cur = conn.cursor()
+                                cur.execute(f'''SELECT min_temperature FROM coldPackages WHERE num = {package_num} ''')
+                                for row in cur:
+                                    min_temp_package = row
+
+                                if(min_temp_container[0]>min_temp_package[0]):
+                                    print(f"The package {package_num} will be spoiled in this container")
+
+                                else:
+                                
+                                    conn = sq.connect("freezerContainer.db")
+                                    cur = conn.cursor() 
+
+                                    cur.execute(f'''UPDATE freezerContainer SET weight ={Container_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_container[0]+1} WHERE num={container_num}''')
+                                    conn.commit()
+                                    conn.close()
+
+                                    conn = sq.connect("Container_Packages.db")
+                                    cur = conn.cursor()
+                                    cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
+                                    cur.execute(f'''INSERT OR IGNORE INTO Container_Packages VALUES ({package_num},{container_num},'cold','cold')''')
+
+                                    conn.commit()
+                                    conn.close()
 
 #################################
     
     conn = sq.connect("breakableContainer.db")
-    cur = conn.cursor()
-    for container_num in (f'{container_num}'): 
-        cur.execute(f"SELECT {container_num} FROM breakableContainer WHERE num = ?", (container_num,))
-        data=cur.fetchone()
+    cur = conn.cursor()   
+    cur.execute(f'SELECT 1 FROM breakableContainer WHERE num={container_num} ')
+    data = cur.fetchone()
     if data is not None:
         conn = sq.connect("breakableContainer.db")
         cur = conn.cursor()
@@ -867,52 +1035,123 @@ def addPackageToCantainer(container_num):
                 print("breakable packages\n number - weight - destination - beginning - property")
                 for row in cur.execute('''SELECT * FROM breakablePackages '''):
                     print(row)
+
+                input_string = input("enter numbers seperated by space :")
+                package_num_list = input_string.split()
+                for i in range(len(package_num_list)):
+                    package_num_list[i] = int(package_num_list[i])
                 
-                package_num = int(input("Enter package number : "))
+                for package_num in package_num_list:
                 
-                conn = sq.connect("Container_Packages.db")
-                cur = conn.cursor()
-                for package_num in (f'{package_num}'): 
-                    cur.execute(f"SELECT {package_num} FROM Container_packages WHERE num_package = ?", (package_num,))
-                    data=cur.fetchone()
-                if data is not None:
-                    print("package is already exist in a container")
-                else:
-                    conn = sq.connect("Car_Packages.db")
-                    cur = conn.cursor()
-                    for package_num in (f'{package_num}'): 
-                        cur.execute(f"SELECT {package_num} FROM Car_packages WHERE num_package = ?", (package_num,))
-                        data=cur.fetchone()
+                
+                
+                    conn = sq.connect("Container_Packages.db")
+                    cur = conn.cursor()   
+                    cur.execute(f'SELECT 1 FROM Container_Packages WHERE num={package_num} ')
+                    data = cur.fetchone()
                     if data is not None:
-                        print("package is already exist in a car with room")
+                        print(f"package {package_num} is already exist in a container")
                     else:
-                        conn = sq.connect("breakablePackages.db")
-                        cur = conn.cursor()
-                        cur.execute(f'''SELECT weight FROM breakablePackages WHERE num = {package_num} ''')
-                        for row in cur:
-                            package_weight = row
-
-
-                        if Container_weight[0] + package_weight[0] > max_container_weight[0]:
-                            print("By adding this package, the weight of the breakable container exceeds its limit")    
-
-
+                        conn = sq.connect("Car_Packages.db")
+                        cur = conn.cursor()   
+                        cur.execute(f'SELECT 1 FROM Car_Packages WHERE num={package_num} ')
+                        data = cur.fetchone()
+                        if data is not None:
+                            print(f"package {package_num} is already exist in a car with room")
                         else:
-                            conn = sq.connect("breakableContainer.db")
-                            cur = conn.cursor() 
-
-                            cur.execute(f'''UPDATE breakableContainer SET weight ={Container_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_container[0]+1} WHERE num={container_num}''')
-                            conn.commit()
-                            conn.close()
-
-                            conn = sq.connect("Container_Packages.db")
+                            conn = sq.connect("breakablePackages.db")
                             cur = conn.cursor()
+                            cur.execute(f'''SELECT weight FROM breakablePackages WHERE num = {package_num} ''')
+                            for row in cur:
+                                package_weight = row
 
-                            cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
-                            cur.execute(f'''INSERT OR IGNORE INTO Container_Packages VALUES ({package_num},{container_num},'breakable','breakable')''')
 
-                            conn.commit()
-                            conn.close()
+                            if Container_weight[0] + package_weight[0] > max_container_weight[0]:
+                                print(f"By adding package {package_num}, the weight of the breakable container exceeds its limit")    
+
+
+                            else:
+                                conn = sq.connect("breakableContainer.db")
+                                cur = conn.cursor() 
+
+                                cur.execute(f'''UPDATE breakableContainer SET weight ={Container_weight[0]+ package_weight[0]} , number_of_packages = {packages_number_in_container[0]+1} WHERE num={container_num}''')
+                                conn.commit()
+                                conn.close()
+
+                                conn = sq.connect("Container_Packages.db")
+                                cur = conn.cursor()
+
+                                cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
+                                cur.execute(f'''INSERT OR IGNORE INTO Container_Packages VALUES ({package_num},{container_num},'breakable','breakable')''')
+
+                                conn.commit()
+                                conn.close()
+
+    else:print('container doesnt exist')
+                            
+
+                         
+def ShowPackagesWaitingForReceive(): 
+    pass
+        
+        
+
+def export_waybill():
+    conn = sq.connect("Car_Packages.db")
+    cur = conn.cursor()
+    cur.execute('''SELECT num FROM Car_Packages ''')
+    carWithRoom_keys = cur.fetchall()
+    
+    conn - sq.connect("containerCar_Container")
+    cur = conn.cursor()
+    cur.execute('''SELECT containerCar_num FROM containerCar_Container''')
+    containerCar_keys = cur.fetchall()
+    
+    conn = sq.connect("carWithRoom")
+    cur = conn.cursor()
+    print("car with rooms\n number - max_weight - max_package - currnet number of packages in car - current weight - property")
+    for i in carWithRoom_keys:
+        for row in cur.execute(f'''SELECT * FROM carWithRoom WHERE num = {i[0]}'''):
+            print(row)
+    
+    conn = sq.connect("containerCar.db")   
+    print("container cars\n number - max_weight - max_container - current number of containers in car - current weight - property")
+    for i in containerCar_keys:
+        for row in cur.execute(f'''SELECT * FROM containerCar WHERE num = {i[0]}'''):
+            print(row)    
+            
+    input_string = input("enter numbers seperated by space :")
+    car_num_list = input_string.split()
+    for i in range(len(car_num_list)):
+        car_num_list[i] = int(car_num_list[i])
+    
+    for car_num in car_num_list:    
+        conn = sq.connect("carWithRoom.db")
+        cur = conn.cursor()   
+        cur.execute(f'SELECT 1 FROM carWithRoom WHERE num={car_num} ')
+        data = cur.fetchone()
+        if data is not None:
+            pass
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        conn = sq.connect("containerCar.db")
+        cur = conn.cursor()   
+        cur.execute(f'SELECT 1 FROM containerCar WHERE num={car_num} ')
+        data = cur.fetchonec
+        if data is not None:  
+            pass 
+        
+        else: print('car doesnt exist')
+        
+
+#adders need rework
 
 
 # x9 = Container(6,900,70)
@@ -928,16 +1167,20 @@ def addPackageToCantainer(container_num):
 # x45 = breakableContainer(98,1800,600,100)
 # x78 = Package(98,15,"nyc","vienna")
 # x96 = Package(65,12,"a","b")
-# x94 = Package(9,65,'save','qom')
+# x94 = Package(9,65,'save','qom')c
+# x41 = Package(166,79,'d','4')
+# x58 = breakableContainer(8,456,10,50)
 #########################################################################
-# conn = sq.connect("Packages.db")
-# cur = conn.cursor()
-# cur.execute('''SELECT weight FROM Packages WHERE num = 9 ''')
-# for row in cur:
-#     print(row)
-
-########################################
 # addPackageToCantainer(6)
 # addPackageToCantainer(2)
-addPackageTocarWithRoom(9)
+# addPackageTocarWithRoom(9)
 # addContainertoCar(6)
+
+# ShowPackagesWaitingForReceive()
+# addContainertoCar(6)
+
+
+
+
+        # conn = sq.connect('Packages_waiting.db')
+        # cur = conn.cursor()
