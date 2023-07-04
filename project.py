@@ -56,17 +56,8 @@ class Package:
             cur.execute(f'''UPDATE Packages SET beginning='{beginning}' WHERE num = {num}''')     
         conn.commit()
         conn.close()
-        
-    
-    def removePackage(self,num):
-        conn = sq.connect("Packages.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE from Packages WHERE num = {num}''')
-        conn.commit()
-        conn.close()
 
 
-   
     
 class coldPackage:
     def __init__(self,num,weight,destination,beginning,min_temperature,property = ""):
@@ -125,13 +116,6 @@ class coldPackage:
         conn.commit()
         conn.close()
     
-    def removeColdPackage(self,num):
-        conn = sq.connect("coldPackages.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE from codlPackages WHERE num = {num}''')
-        conn.commit()
-        conn.close()
-        
         
         
         
@@ -189,14 +173,51 @@ class breakablePackage():
             conn.commit()
             conn.close()      
 
-        def removebreakablePackage(self,num):
-            conn = sq.connect("breakablePackages.db")
-            cur = conn.cursor()
-            cur.execute(f'''DELETE from breakablePackages WHERE num = {num}''')
-            conn.commit()
-            conn.close()
    
-
+def packageRemover(num):
+    type_package = input("Enter type of package like 'normal or cold or breakable' : ")
+    if type_package== 'normal':
+        conn = sq.connect("Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Packages WHERE num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Container_Packages WHERE num_package = {num}''')
+        conn.commit()
+        conn.close()
+        print("package deleted")
+        
+    if type_package == "cold":
+        conn = sq.connect("coldPackages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM coldPackages WHERE num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Container_Packages WHERE num_package = {num}''')
+        conn.commit()
+        conn.close()
+        print("package deleted")
+        
+    if type_package == "breakable":
+        conn = sq.connect("breakablePackages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM breakablePackages WHERE num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Container_Packages WHERE num_package = {num}''')
+        conn.commit()
+        conn.close()
+        print("package deleted")
+        
   
     
 
@@ -748,11 +769,11 @@ def addContainertoCar(container_num):
                         print(f"The capacity of the vehicle for the container {containerCar_num} is complete")
 
                     else:
-                        conn = sq.connect("contaeinerCar_Container.db")
+                        conn = sq.connect("containerCar_Container.db")
                         cur = conn.cursor()
     
-                        cur.execute('''CREATE TABLE IF NOT EXISTS container_car (Container_num int PRIMARY KEY,containerCar_num int ,type_container text)''')
-                        cur.execute(f'''INSERT OR IGNORE INTO container_car VALUES ({container_num},{containerCar_num},'cold')''')
+                        cur.execute('''CREATE TABLE IF NOT EXISTS containerCar_Container (Container_num int PRIMARY KEY,containerCar_num int ,type_container text)''')
+                        cur.execute(f'''INSERT OR IGNORE INTO containerCar_Container VALUES ({container_num},{containerCar_num},'cold')''')
                         conn.commit()
                         conn.close()
                     
@@ -803,7 +824,7 @@ def addContainertoCar(container_num):
                         print(f"The capacity of the vehicle for the container {containerCar_num} is complete")
 
                     else:
-                        conn = sq.connect("contaeinerCar_Container.db")
+                        conn = sq.connect("containerCar_Container.db")
                         cur = conn.cursor()
     
                         cur.execute('''CREATE TABLE IF NOT EXISTS container_car (Container_num int PRIMARY KEY,containerCar_num int ,type_container text)''')
@@ -812,7 +833,7 @@ def addContainertoCar(container_num):
                         conn.close()
         
         
-                   
+                   #add weight
 def addPackageToCantainer(container_num):
     
     conn = sq.connect("Container.db")
@@ -944,7 +965,7 @@ def addPackageToCantainer(container_num):
                 
                     conn = sq.connect("Container_Packages.db")
                     cur = conn.cursor()   
-                    cur.execute(f'SELECT 1 FROM Container_Packages WHERE num={package_num} ')
+                    cur.execute(f'SELECT 1 FROM Container_Packages WHERE num_package={package_num} ')
                     data = cur.fetchone()
                     if data is not None:
                         print(f"package {package_num} is already exist in a container")
@@ -952,7 +973,7 @@ def addPackageToCantainer(container_num):
                     else:
                         conn = sq.connect("Car_Packages.db")
                         cur = conn.cursor()   
-                        cur.execute(f'SELECT 1 FROM Car_Packages WHERE num={package_num} ')
+                        cur.execute(f'SELECT 1 FROM Car_Packages WHERE num_package={package_num} ')
                         data = cur.fetchone()
                         if data is not None:
                             print(f"package {package_num} is already exist in a car with room")
@@ -973,7 +994,7 @@ def addPackageToCantainer(container_num):
 
                                 conn = sq.connect("freezerContainer.db")
                                 cur = conn.cursor()
-                                cur.execute(f'''SELECT min_temp_produced_by_container FROM coldPackages WHERE num = {container_num} ''')
+                                cur.execute(f'''SELECT min_temp_produced_by_container FROM freezerContainer WHERE num = {container_num} ''')
                                 for row in cur:
                                     min_temp_container = row
 
@@ -1089,11 +1110,6 @@ def addPackageToCantainer(container_num):
                                 conn.close()
 
 
-                            
-
-                         
-def ShowPackagesWaitingForReceive(): 
-    pass
         
         
 
@@ -1228,24 +1244,26 @@ def export_waybill():
                 conn = sq.connect('containerCar.db')
                 cur = conn.cursor()
                 cur.execute(f'''SELECT * FROM containerCar WHERE num = {car_num}''')
-                car = cur.fetchall()
+                car = cur.fetchone()
 
+                if car == None:break
+                
                 conn = sq.connect('waybill.db')
                 cur = conn.cursor()
                 cur.execute('''CREATE TABLE IF NOT EXISTS containerCar (num int PRIMARY KEY, max_weight real,max_container_can_be_connected int,number_of_containers int,weight real,property text)''')
-                cur.execute(f'''INSERT OR IGNORE INTO containerCar VALUES ({car[0][0]},{car[0][1]},{car[0][2]},{car[0][3]},{car[0][4]},'{car[0][5]}')''')   
+                cur.execute(f'''INSERT OR IGNORE INTO containerCar VALUES ({car[0]},{car[1]},{car[2]},{car[3]},{car[4]},'{car[5]}')''')   
                 conn.commit()
                 conn.close()
 
                 conn = sq.connect("containerCar.db")
                 cur = conn.cursor()
-                cur.execute(f'''DELETE from containerCar WHERE num = {car_num}''')
+                # cur.execute(f'''DELETE from containerCar WHERE num = {car_num}''')
                 conn.commit()
                 conn.close()
                 
                 conn = sq.connect("containerCar_Container.db")
                 cur = conn.cursor()
-                cur.execute(f'''DELETE from containerCar_Container WHERE Container_num = {container_key[0]}''')
+                # cur.execute(f'''DELETE from containerCar_Container WHERE Container_num = {container_key[0]}''')
                 conn.commit()
                 conn.close()
                 
@@ -1260,19 +1278,19 @@ def export_waybill():
                         cur.execute(f'''SELECT * FROM Container WHERE num = {container_key[0]}''')
                         container = cur.fetchone()
                         
-                        cur.execute(f'''DELETE FROM Container WHERE num = {container_key[0]}''')
+                        # cur.execute(f'''DELETE FROM Container WHERE num = {container_key[0]}''')
                         
-                        conn = sq.connect("waybill")
+                        conn = sq.connect("waybill.db")
                         cur = conn.cursor()
-                        cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY ,  max_weight real ,max_package int , number_of_packages int,weight real ,type_container text, property text)''')
-                        cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'normal','{container[5]}')''')
+                        cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY ,  max_weight real ,max_package int , number_of_packages int,weight real , property text)''')
+                        cur.execute(f'''INSERT OR IGNORE INTO Container VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'{container[5]}')''')
                         conn.commit()
                         conn.close()
                                             
                         for package_key in package_keys:
                             conn = sq.connect('waybill.db')
                             cur = conn.cursor()
-                            cur.execute(f'''CREATE TABLE IF NOT EXISTS packages_inContainer (num_package int PEIMARY KEY,num_container int,type_package text)''')
+                            cur.execute(f'''CREATE TABLE IF NOT EXISTS packages_inContainer (num_package int PRIMARY KEY,num_container int,type_package text)''')
                             cur.execute(f'''INSERT OR IGNORE INTO packages_inContainer VALUES({package_key[0]},{container_key[0]},'normal')''')        
                             conn.commit()
                             conn.close()
@@ -1295,26 +1313,26 @@ def export_waybill():
                             cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({package[0]},{package[1]},'{package[2]}','{package[3]}')''')     
                             conn.commit()
                             conn.close()
-                if type_container == 'cold' :  
+                if type_container[0] == 'cold' :  
                        
                         conn = sq.connect('freezerContainer.db')
                         cur = conn.cursor()
-                        cur.execute(f'''SELECT * FROM freeerContainer WHERE num = {container_key[0]}''')
+                        cur.execute(f'''SELECT * FROM freezerContainer WHERE num = {container_key[0]}''')
                         container = cur.fetchone()
                         
-                        cur.execute(f'''DELETE FROM freezerContainer WHERE num = {container_key[0]}''')
+                        # cur.execute(f'''DELETE FROM freezerContainer WHERE num = {container_key[0]}''')
                         
-                        conn = sq.connect("waybill")
+                        conn = sq.connect("waybill.db")
                         cur = conn.cursor()
-                        cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY ,  max_weight real ,max_package int , number_of_packages int,weight real ,type_container text, property text)''')
-                        cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'cold','{container[5]}')''')
+                        cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY ,  max_weight real ,max_package int , number_of_packages int,weight real , property text)''')
+                        cur.execute(f'''INSERT OR IGNORE INTO Container VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'{container[5]}')''')
                         conn.commit()
                         conn.close()          
                         for package_key in package_keys:
                             conn = sq.connect('waybill.db')
                             cur = conn.cursor()
-                            cur.execute(f'''CREATE TABLE IF NOT EXISTS packages_inContainer (num_package int PEIMARY KEY,num_container int,type_package text)''')
-                            cur.execute(f'''INSERT OR IGNORE INTO packages_inContainer VALUES({package_key[0]},{container_key},'cold')''')        
+                            cur.execute(f'''CREATE TABLE IF NOT EXISTS packages_inContainer (num_package int PRIMARY KEY,num_container int,type_package text)''')
+                            cur.execute(f'''INSERT OR IGNORE INTO packages_inContainer VALUES({package_key[0]},{container_key[0]},'cold')''')        
                             conn.commit()
                             conn.close()
 
@@ -1326,7 +1344,7 @@ def export_waybill():
 
                             conn = sq.connect("coldPackages.db")
                             cur = conn.cursor()
-                            cur.execute(f'''DELETE from coldPackages WHERE num = {package_key[0]}''')
+                            # cur.execute(f'''DELETE from coldPackages WHERE num = {package_key[0]}''')
                             conn.commit()
                             conn.close()
 
@@ -1337,7 +1355,7 @@ def export_waybill():
                             conn.commit()
                             conn.close()
                       
-                if type_container == 'breakable':
+                if type_container[0] == 'breakable':
                     conn = sq.connect('breakableContainer.db')
                     cur = conn.cursor()
                     cur.execute(f'''SELECT * FROM breakableContainer WHERE num = {container_key[0]}''')
@@ -1345,17 +1363,17 @@ def export_waybill():
                     
                     cur.execute(f'''DELETE FROM breakableContainer WHERE num = {container_key[0]}''')
                     
-                    conn = sq.connect("waybill")
+                    conn = sq.connect("waybill.db")
                     cur = conn.cursor()
-                    cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY ,  max_weight real ,max_package int , number_of_packages int,weight real ,type_container text, property text)''')
-                    cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'breakable','{container[5]}')''')
+                    cur.execute('''CREATE TABLE IF NOT EXISTS Container (num int PRIMARY KEY ,  max_weight real ,max_package int , number_of_packages int,weight real , property text)''')
+                    cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'{container[5]}')''')
                     conn.commit()
                     conn.close()
                     for package_key in package_keys:
                             conn = sq.connect('waybill.db')
                             cur = conn.cursor()
-                            cur.execute(f'''CREATE TABLE IF NOT EXISTS packages_inContainer (num_package int PEIMARY KEY,num_container int,type_package text)''')
-                            cur.execute(f'''INSERT OR IGNORE INTO packages_inContainer VALUES({package_key[0]},{container_key},'breakable')''')        
+                            cur.execute(f'''CREATE TABLE IF NOT EXISTS packages_inContainer (num_package int PRIMARY KEY,num_container int,type_package text)''')
+                            cur.execute(f'''INSERT OR IGNORE INTO packages_inContainer VALUES({package_key[0]},{container_key[0]},'breakable')''')        
                             conn.commit()
                             conn.close()                            
                             conn = sq.connect('breakablePackages.db')
@@ -1364,7 +1382,7 @@ def export_waybill():
                             package = cur.fetchone()
                             conn = sq.connect("breakablePackages.db")
                             cur = conn.cursor()
-                            cur.execute(f'''DELETE from breakablePackages WHERE num = {package_key[0]}''')
+                            # cur.execute(f'''DELETE from breakablePackages WHERE num = {package_key[0]}''')
                             conn.commit()
                             conn.close()
                             conn = sq.connect('waybill.db')
@@ -1380,68 +1398,345 @@ def export_waybill():
             conn.commit()
             conn.close() 
 ###########################
-    conn = sq.connect("waybill.db")
-    cur = conn.cursor()
-    print("cars with room\nnumber - max weight - max packages - current number of packages - current weight - property  ")
-    for row in cur.execute('''SELECT * FROM carWithRoom '''):
-        print(row)
+    try:
+        conn = sq.connect("waybill.db")
+        cur = conn.cursor()
+        print("cars with room\nnumber - max weight - max packages - current number of packages - current weight - property  ")
+        for row in cur.execute('''SELECT * FROM carWithRoom '''):
+            print(row)
+
+        print("\npackages in car with room\npackage number - car with room number")
+        for row in cur.execute('''SELECT * FROM Car_Packages '''):
+            print(row)   
+    except:pass
     
-    print("\npackages in car with room\npackage number - car with room number")
-    for row in cur.execute('''SELECT * FROM Car_Packages '''):
-        print(row)   
-    
-    print("\ncontainer cars\nnumber - max weight - max container - current number of containers in car - current weight - property") 
-    for row in cur.execute('''SELECT * FROM containerCar'''):
-        print(row)
-        
-    print("\ncontainer in container car\ncontainer number - container car number - type container")
-    for row in cur.execute('''container_incontainerCar'''):
-        print(row)
-        
-    print("\ncontainers\nnumber - max weight - max package - current number of packages - current weight - type container - property")
-    for row in cur.execute('''SELECT * FROM Container'''):
-        print(row)
-           
-    print("\npackage in container\npackage number - container number - type package")
-    for row in cur.execute('''SELECT * FROM packages_inContainer'''):
-        print(row)     
-    
+    try:
+        print("\ncontainer cars\nnumber - max weight - max container - current number of containers in car - current weight - property") 
+        for row in cur.execute('''SELECT * FROM containerCar'''):
+            print(row)
+
+        print("\ncontainer in container car\ncontainer number - container car number - type container")
+        for row in cur.execute('''SELECT * FROM container_incontainerCar'''):
+            print(row)
+
+        print("\ncontainers\nnumber - max weight - max package - current number of packages - current weight - type container - property")
+        for row in cur.execute('''SELECT * FROM Container'''):
+            print(row)
+
+        print("\npackage in container\npackage number - container number - type package")
+        for row in cur.execute('''SELECT * FROM packages_inContainer'''):
+            print(row)     
+    except:pass
     print("\npackages\npackage number - weight - destination - beginning") 
     for row in cur.execute('''SELECT * FROM Packages'''):
         print(row)
              
+def showPackages_onTheWay():
+    conn = sq.connect("waybill.db")
+    cur = conn.cursor()
+    print("\npackages\npackage number - weight - destination - beginning") 
+    for row in cur.execute('''SELECT * FROM Packages'''):
+        print(row)
+
+    input_string = input("enter numbers seperated by space :")
+    package_num_list = input_string.split()
+    for i in range(len(package_num_list)):
+        package_num_list[i] = int(package_num_list[i])    
+
+    for package_num in package_num_list:
+        
+        conn = sq.connect("waybill.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT * FROM Car_Packages WHERE package_num = {package_num}''')
+        data = cur.fetchone()
+        if data is not None:
+            cur.execute(f'''SELECT car_num FROM Car_Packages WHERE package_num = {package_num}''')
+            car_num = cur.fetchone()
+            
+            cur.execute(f'''SELECT package_num FROM Car_Packages WHERE car_num = {car_num[0]}''')
+            packages_num_incar_list = cur.fetchall()
+            
+            for package_num2 in packages_num_incar_list:
+
+                # cur.execute(f'''DELETE FROM Car_Packages WHERE package_num = {package_num}''')
+                
+                conn = sq.connect("waybill.db")
+                cur = conn.cursor()
+                cur.execute(f'''SELECT * FROM Packages WHERE package_num = {package_num2[0]}''')
+                package = cur.fetchone()
+
+                # cur.execute(f'''DELETE  FROM Packages WHERE num = {package_num2[0]}''')
+                
+
+                conn = sq.connect("Packages.db")
+                cur = conn.cursor()
+                cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({package[0]},{package[1]},'{package[2]}','{package[3]}')''')
+                conn.commit()
+                conn.close()
+
+            # conn = sq.connect("waybill.db")
+            # cur = conn.cursor()
+            # cur.execute(f'''DELETE  FROM Car_Packages WHERE car_num = {car_num[0]}''')
+            # conn.commit()
+            
+            conn = sq.connect("waybill.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT * FROM carWithRoom WHERE num = {car_num[0]}''')
+            car = cur.fetchone()
+            conn.commit()
+            
+            
+            conn = sq.connect("carWithRoom.db")
+            cur = conn.cursor()
+            cur.execute(f'''INSERT OR IGNORE INTO carWithRoom VALUES ({car[0]},{car[1]},{car[2]},{car[3]},{car[4]},'{car[5]}')''')
+            conn.commit()
+            conn.close()
+            
+            
+            
+            
+            
+            #____________
+            
+            
+
+        conn = sq.connect("waybill.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT * FROM packages_inContainer WHERE num_package = {package_num}''')  
+        data = cur.fetchone()
+        if data is not None:
+            conn = sq.connect("waybill.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT type_package FROM packages_inContainer WHERE num_package = {package_num}''')
+            type_package = cur.fetchone()
+            if type_package[0] == "normal":
+                cur.execute(f'''SELECT num_container FROM packages_inContainer WHERE num_package = {package_num}''')
+                container_num = cur.fetchone()
+                
+                cur.execute(f'''SELECT containerCar_num FROM container_incontainerCar WHERE container_num = {container_num[0]}''')
+                containerCar_num = cur.fetchone()
+                
+                cur.execute(f'''SELECT container_num  FROM container_incontainerCar WHERE containerCar_num = {containerCar_num[0]}''')
+                containers_num_incar = cur.fetchall()
+                
+                cur.execute(f'DELETE  FROM container_incontainerCar WHERE containerCar_num = {container_num[0]}')
+                conn.commit()
+                
+                cur.execute(f'''SELECT * FROM containerCar WHERE num = {containerCar_num[0]}''')
+                containerCar = cur.fetchone()
+                
+                cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                conn.commit()
+                conn.close()
+                
+                conn = sq.connect("containerCar.db")
+                cur = conn.cursor()
+                cur.execute(f'''INSERT OR IGNORE INTO containerCar VALUES ({containerCar[0]},{containerCar[1]},{containerCar[2]},{containerCar[3]},{containerCar[4]},'{containerCar[5]}')''')
+                conn.commit()
+                conn.close()
+                
+                for container_i in containers_num_incar:
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT * FROM Container WHERE num = {container_i[0]}''')
+                    container = cur.fetchone()
+                    
+                    cur.execute(f'DELETE  FROM Container WHERE num = {container_i[0]}')
+                    conn.commit()
+                    
+                    conn = sq.connect("Container.db")
+                    cur =conn.cursor()
+                    cur.execute(f'''INSERT OR IGNORE INTO Container VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},'{container[5]}')''')    
+                    conn.commit()
+                    conn.close()
+                    
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT num_package FROM packages_inContainer WHERE num_container = {container_i[0]}''')
+                    packages_num_incontainer_list = cur.fetchall()
+                    cur.execute(f'''DELETE FROM packages_inContainer WHERE num_container = {container_i[0]}''')
+                    conn.commit()
+                    
+
+                    for package_i in packages_num_incontainer_list:
+                        conn = sq.connect("waybill.db")
+                        cur = conn.cursor()
+                        cur.execute(f'SELECT * FROM Packages WHERE package_num = {package_i[0]}')
+                        package = cur.fetchone()
                         
+                        
+                        cur.execute(f'DELETE  FROM Packages WHERE package_num = {package_i[0]}')
+                        conn.commit()
+                
+                        conn = sq.connect("Packages.db")
+                        cur = conn.cursor()
+                        cur.execute(f'''INSERT OR IGNORE INTO Packages VALUES ({package[0]},{package[1]},'{package[2]}','{package[3]}')''')
+                        conn.commit()
+                        conn.close()
+                        
+                        conn = sq.connect("waybill.db")
+                        cur = conn.cursor()
+                        cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                        conn.commit()
+                        conn.close()
+                
+                
+                
+                
+            
+            if type_package[0] == "cold":
+                cur.execute(f'''SELECT num_container FROM packages_inContainer WHERE num_package = {package_num}''')
+                container_num = cur.fetchone()
+                
+                cur.execute(f'''SELECT containerCar_num FROM container_incontainerCar WHERE container_num = {container_num[0]}''')
+                containerCar_num = cur.fetchone() 
+                
+                cur.execute(f'''SELECT container_num  FROM container_incontainerCar WHERE containerCar_num = {containerCar_num[0]}''')
+                containers_num_incar = cur.fetchall()             
+  
+                # cur.execute(f'DELETE FROM container_incontainerCar WHERE containerCar_num = {container_num[0]}')
+                conn.commit()
+                
+                cur.execute(f'''SELECT * FROM containerCar WHERE num = {containerCar_num[0]}''')
+                containerCar = cur.fetchone()
+            
+                # cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                conn.commit()
+                conn.close()
+                
+                conn = sq.connect("containerCar.db")
+                cur = conn.cursor()
+                cur.execute(f'''INSERT OR IGNORE INTO containerCar VALUES ({containerCar[0]},{containerCar[1]},{containerCar[2]},{containerCar[3]},{containerCar[4]},'{containerCar[5]}')''')
+                conn.commit()
+                conn.close()
+                
+                for container_i in containers_num_incar:
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT * FROM Container WHERE num = {container_i[0]}''')
+                    container = cur.fetchone()
+                    
+                    # cur.execute(f'DELETE  FROM Container WHERE num = {container_i[0]}')
+                    conn.commit()
+                    
+                    conn = sq.connect("freezerContainer.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''INSERT OR IGNORE INTO freezerContainer VALUES ({container[0]},{container[1]},{container[2]},{container[3]},{container[4]},-5,'{container[5]}')''')    
+                    conn.commit()
+                    conn.close()
+                    
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT num_package FROM packages_inContainer WHERE num_container = {container_i[0]}''')
+                    packages_num_incontainer_list = cur.fetchall()
+                    # cur.execute(f'''DELETE FROM packages_inContainer WHERE num_container = {container_i[0]}''')
+                    conn.commit()
+                    for package_i in packages_num_incontainer_list:
+                        conn = sq.connect("waybill.db")
+                        cur = conn.cursor()
+                        cur.execute(f'SELECT * FROM Packages WHERE package_num = {package_i[0]}')
+                        package = cur.fetchone()
+                        
+                        
+                        # cur.execute(f'DELETE  FROM Packages WHERE package_num = {package_i[0]}')
+                        conn.commit()
+                
+                        conn = sq.connect("coldPackages.db")
+                        cur = conn.cursor()
+                        cur.execute(f'''INSERT OR IGNORE INTO coldPackages VALUES ({package[0]},{package[1]},'{package[2]}','{package[3]}',{5},'')''')
+                        conn.commit()
+                        conn.close()
+                        
+                        conn = sq.connect("waybill.db")
+                        cur = conn.cursor()
+                        # cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                        conn.commit()
+                        conn.close()
+                
+                
+                
+            
+            if type_package[0] == "breakable":
+                
+                cur.execute(f'''SELECT num_container FROM packages_inContainer WHERE num_package = {package_num}''')
+                container_num = cur.fetchone()
+                
+                cur.execute(f'''SELECT containerCar_num FROM container_incontainerCar WHERE container_num = {container_num[0]}''')
+                containerCar_num = cur.fetchone() 
+                
+                cur.execute(f'''SELECT container_num  FROM container_incontainerCar WHERE containerCar_num = {containerCar_num[0]}''')
+                containers_num_incar = cur.fetchall()             
+  
+                # cur.execute(f'DELETE FROM container_incontainerCar WHERE containerCar_num = {container_num[0]}')
+                conn.commit()
+                
+                cur.execute(f'''SELECT * FROM containerCar WHERE num = {containerCar_num[0]}''')
+                containerCar = cur.fetchone()
+            
+                # cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                conn.commit()
+                conn.close()
+                
+                conn = sq.connect("containerCar.db")
+                cur = conn.cursor()
+                cur.execute(f'''INSERT OR IGNORE INTO containerCar VALUES ({containerCar[0]},{containerCar[1]},{containerCar[2]},{containerCar[3]},{containerCar[4]},'{containerCar[5]}')''')
+                conn.commit()
+                conn.close()
+                
+                for container_i in containers_num_incar:
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT * FROM Container WHERE num = {container_i[0]}''')
+                    container = cur.fetchone()
+                    
+                    # cur.execute(f'DELETE  FROM Container WHERE num = {container_i[0]}')
+                    conn.commit()
+                    
+                    conn = sq.connect("breakableContainer.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''INSERT OR IGNORE INTO breakablerContainer VALUES ({container[0]},{container[1]},{container[2]},110,{container[3]},{container[4]},'{container[5]}')''')    
+                    conn.commit()
+                    conn.close()
+                    
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT num_package FROM packages_inContainer WHERE num_container = {container_i[0]}''')
+                    packages_num_incontainer_list = cur.fetchall()
+                    # cur.execute(f'''DELETE FROM packages_inContainer WHERE num_container = {container_i[0]}''')
+                    conn.commit()
+                    
+                    for package_i in packages_num_incontainer_list:
+                        conn = sq.connect("waybill.db")
+                        cur = conn.cursor()
+                        cur.execute(f'SELECT * FROM Packages WHERE package_num = {package_i[0]}')
+                        package = cur.fetchone()
+                        
+                        
+                        # cur.execute(f'DELETE  FROM Packages WHERE package_num = {package_i[0]}')
+                        conn.commit()
+                
+                        conn = sq.connect("breakablePackages.db")
+                        cur = conn.cursor()
+                        cur.execute(f'''INSERT OR IGNORE INTO breakablePackages VALUES ({package[0]},{package[1]},'{package[2]}','{package[3]}','')''')
+                        conn.commit()
+                        conn.close()
+                        
+                        conn = sq.connect("waybill.db")
+                        cur = conn.cursor()
+                        # cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                        conn.commit()
+                        conn.close()
+                
+                
+                
+                
+     
 #adders need rework  and remover
+#package tedad when add to container
 
-# print all the barname
-
-# x9 = Container(6,900,70)
-# x5 = Package(10,6,"hmd","tehran")
-# x1 = breakablePackage(1,6,"hmd","tehran")
-# x2 = coldPackage(1,3,"azar","canada",0)
-# x3 = Package(4,9,"america","turkey")
-# x10 = carWithRoom(9,900,300,)
-# x11 = carWithRoom(12,1000,546)
-# x12 = containerCar(6,9000,5,)
-# x6 = freezerContainer(1,100,30,5,)
-# x7 = breakableContainer(2,1000,50,70,)
-# x45 = breakableContainer(98,1800,600,100)
-# x78 = Package(98,15,"nyc","vienna")
-# x96 = Package(65,12,"a","b")
-# x94 = Package(62,65,'f','z')
-# x41 = Package(166,79,'d','4')
-# x58 = breakableContainer(8,456,10,50)
-# x9 = containerCar(98,1512,5,)
-# x126 = Container(101,800,80)
-# x4= containerCar(53,2000,20,)
-#########################################################################
+#__________________________________________________________________
 
 
-
-
-
-
-# export_waybill()
 
 # x1 = Package(5,10,'a','b')
 # x2 = Container(5,1000,1000,)
@@ -1459,3 +1754,32 @@ def export_waybill():
 # x1 = Package(40,40,'z','a')
 # x2 = carWithRoom(40,500,9,)
 # addPackageTocarWithRoom(40)
+
+
+# export_waybill()
+
+# showPackages_onTheWay()
+
+
+
+# x1 = coldPackage(70,6,'g','t',10)
+# x2 = coldPackage(71,3,'d','t',9)
+# x3 = coldPackage(72,2,'i','y',6)
+# x4 = coldPackage(73,3,'o','w',3)
+
+# x5 = freezerContainer(70,1000,100,0)
+# x6 = freezerContainer(71,1001,60,0)
+
+# x7 = containerCar(70,9000,9)
+ 
+# addPackageToCantainer(70)
+# addPackageToCantainer(71)
+
+# addContainertoCar(71)
+# addContainertoCar(70)
+
+# export_waybill()
+
+
+# showPackages_onTheWay()
+#____________________________________
