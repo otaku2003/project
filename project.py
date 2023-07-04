@@ -43,20 +43,6 @@ class Package:
             conn.commit()
             conn.close()
 
-    def editPackage(self,num,weight = "",destination = "",beginning = ""):
-        conn = sq.connect("Packages.db")
-        cur = conn.cursor()
-        if weight != "":
-            cur.execute(f'''UPDATE Packages SET weight={weight} WHERE num = {num}''') 
-            
-        if destination != "":
-            cur.execute(f'''UPDATE Packages SET destination='{destination}' WHERE num = {num}''')
-             
-        if beginning != "":
-            cur.execute(f'''UPDATE Packages SET beginning='{beginning}' WHERE num = {num}''')     
-        conn.commit()
-        conn.close()
-
 
     
 class coldPackage:
@@ -95,32 +81,12 @@ class coldPackage:
             conn.commit()
             conn.close()
         
-        
-    def editcoldPackage(self,num,weight = "",destination = "",beginning = "",min_temperature = '',property = ''):
-        conn = sq.connect("coldpackages.db")
-        cur = conn.cursor()
-        if weight != "":
-            cur.execute(f'''UPDATE coldPackages SET weight={weight} WHERE num = {num}''') 
-            
-        if destination != "":
-            cur.execute(f'''UPDATE coldPackages SET destination='{destination}' WHERE num = {num}''')
-             
-        if beginning != "":
-            cur.execute(f'''UPDATE coldPackages SET beginning='{beginning}' WHERE num = {num}''')    
-            
-        if min_temperature != "":
-             cur.execute(f'''UPDATE coldPackages SET min_temperature='{min_temperature}' WHERE num = {num}''') 
-        
-        if property != "":
-            cur.execute(f'''UPDATE coldPackages SET property='{property}' WHERE num = {num}''') 
-        conn.commit()
-        conn.close()
     
         
         
         
 class breakablePackage():
-        def __init__(self,num,weight,destination,beginning,property = ""):
+        def __init__(num,weight,destination,beginning,property = ""):
             try:    
                 conn = sq.connect("breakablePackages.db")
                 cur = conn.cursor()    
@@ -155,23 +121,7 @@ class breakablePackage():
                 cur.execute(f'''INSERT OR IGNORE INTO breakablePackages VALUES ({num},{weight},'{destination}','{beginning}','{property}')''')
                 conn.commit()
                 conn.close()
-  
-        def editbreakablePackage(self,num,weight = "",destination = "",beginning = "",property = ""):
-            conn = sq.connect("breakablePackages.db")
-            cur = conn.cursor()
-            if weight != "":
-                cur.execute(f'''UPDATE breakablePackages SET weight={weight} WHERE num = {num}''') 
-
-            if destination != "":
-                cur.execute(f'''UPDATE breakablePackages SET destination='{destination}' WHERE num = {num}''')
-
-            if beginning != "":
-                cur.execute(f'''UPDATE breakablePackages SET beginning='{beginning}' WHERE num = {num}''')    
-            
-            if property != "":
-                cur.execute(f'''UPDATE breakablePackages SET property='{property}' WHERE num = {num}''') 
-            conn.commit()
-            conn.close()      
+     
 
    
 def packageRemover(num):
@@ -217,8 +167,98 @@ def packageRemover(num):
         conn.commit()
         conn.close()
         print("package deleted")
+
+def packageEditor(num):
+    conn = sq.connect("Packages.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM Packages WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        weight , destination , beginning = input("Enter weight and destination and beginnig seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
         
-  
+        conn = sq.connect("Packages.db")
+        cur = conn.cursor()
+        if weight != "0":
+            weight = float(weight)
+            cur.execute(f'''UPDATE Packages SET weight={weight} WHERE num = {num}''') 
+            conn.commit()
+            conn.close() 
+              
+            
+            conn = sq.connect("Container_Packages.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT num_Container FROM Container_Packages WHERE num_package = {num}''')
+            container_num = cur.fetchone()
+            if container_num is not None:
+            
+                conn = sq.connect('Container.db')
+                cur = conn.cursor()
+                cur.execute(f'''SELECT weight FROM Container WHERE num = {container_num[0]}''')
+                container_weight = cur.fetchone()
+                
+                cur.execute(f'''UPDATE Container SET weight = {weight+container_weight[0]}''')
+                conn.commit()
+                conn.close()
+                
+            
+        conn = sq.connect("Packages.db")
+        cur = conn.cursor()          
+        if destination != "0":
+            cur.execute(f'''UPDATE Packages SET destination='{destination}' WHERE num = {num}''')
+             
+        if beginning != "0":
+            cur.execute(f'''UPDATE Packages SET beginning='{beginning}' WHERE num = {num}''')     
+        conn.commit()
+        conn.close()
+        
+    conn = sq.connect("coldPackages.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM coldPackages WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        weight ,destination , beginning ,min_temp , property =input("Enter weight and destination and beginnig and min_temprature and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+         
+        if weight != "0":
+            weight = float(weight)
+            cur.execute(f'''UPDATE coldPackages SET weight={weight} WHERE num = {num}''') 
+            
+        if destination != "0":
+            cur.execute(f'''UPDATE coldPackages SET destination='{destination}' WHERE num = {num}''')
+             
+        if beginning != "0":
+            cur.execute(f'''UPDATE coldPackages SET beginning='{beginning}' WHERE num = {num}''')    
+            
+        if min_temp != "0":
+            min_temp = float(min_temp)
+            cur.execute(f'''UPDATE coldPackages SET min_temperature={min_temp} WHERE num = {num}''') 
+        
+        if property != "0":
+            cur.execute(f'''UPDATE coldPackages SET property='{property}' WHERE num = {num}''')
+        conn.commit()
+        conn.close() 
+        
+    conn = sq.connect("breakablePackages.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM breakablePackages WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        
+        weight ,destination , beginning ,property  =  input("Enter weight and destination and beginnig and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+        
+        if weight != "0":
+            weight = float(weight)
+            cur.execute(f'''UPDATE coldPackages SET weight={weight} WHERE num = {num}''') 
+            
+        if destination != "0":
+            cur.execute(f'''UPDATE coldPackages SET destination='{destination}' WHERE num = {num}''')
+             
+        if beginning != "0":
+            cur.execute(f'''UPDATE coldPackages SET beginning='{beginning}' WHERE num = {num}''')  
+              
+        if property != "0":
+            cur.execute(f'''UPDATE coldPackages SET property='{property}' WHERE num = {num}''')
+        conn.commit()
+        conn.close()
     
 
 class Container():
@@ -257,33 +297,7 @@ class Container():
             conn.commit()
             conn.close()
         
-        
-    def editContainer(self,num,max_weight = "",max_package = "",property = ''):
-        conn = sq.connect("Container.db")
-        cur = conn.cursor()
-        if max_weight != "":
-            cur.execute(f'''UPDATE Container SET max_weight={max_weight} WHERE num = {num}''') 
-            
-        if max_package != "":
-            cur.execute(f'''UPDATE Container SET max_package='{max_package}' WHERE num = {num}''')
-             
-        if property != "":
-            cur.execute(f'''UPDATE Container SET property='{property}' WHERE num = {num}''')  
-        conn.commit()
-        conn.close() 
-    
-    
-    def removeContainer(self,num):
-        conn = sq.connect("Container.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE from Container WHERE num = {num}''')
-        conn.commit()
-        conn.close()    
-        
 
-    
-    
-    
 class freezerContainer():
     def __init__(self,num,max_weight,max_package,min_temp_produced_by_container,number_of_packages=0,weight=0,property = ""):
         try:
@@ -320,31 +334,6 @@ class freezerContainer():
             conn.commit()
             conn.close()
 
-    def editfreezerContainer(self,num,max_weight = "",max_package = "",min_temp_produced_by_container = '',property = ''):
-        conn = sq.connect("freezerContainer.db")
-        cur = conn.cursor()
-        if max_weight != "":
-            cur.execute(f'''UPDATE freezerContainer SET max_weight={max_weight} WHERE num = {num}''') 
-            
-        if max_package != "":
-            cur.execute(f'''UPDATE freezerContainer SET max_package='{max_package}' WHERE num = {num}''')
-             
-       
-        if min_temp_produced_by_container != "":
-            cur.execute(f'''UPDATE freezerContainer SET min_temp_produced_by_container='{min_temp_produced_by_container}' WHERE num = {num}''') 
-                           
-        if property != "":
-            cur.execute(f'''UPDATE freezerContainer SET oroperty='{property}' WHERE num = {num}''') 
-
-        conn.commit()
-        conn.close() 
-          
-    def removefreezerContainer(self,num):
-        conn = sq.connect("freezerContainer.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE from freezerContainer WHERE num = {num}''')
-        conn.commit()
-        conn.close()  
         
        
 
@@ -384,34 +373,137 @@ class breakableContainer():
             conn.commit()
             conn.close()
 
-    def editbreakableContainer(self,num,max_weight = "",max_package = "",max_speed_of_car = '',property = ''):
-        conn = sq.connect("breakableContainer.db")
-        cur = conn.cursor()
-        if max_weight != "":
-            cur.execute(f'''UPDATE breakableContainer SET max_weight={max_weight} WHERE num = {num}''') 
-            
-        if max_package != "":
-            cur.execute(f'''UPDATE breakableContainer SET max_package={max_package} WHERE num = {num}''')
-
-        if property != "":
-            cur.execute(f'''UPDATE breakableContainer SET property='{property}' WHERE num = {num}''')  
-            
-        if max_speed_of_car != '':
-            cur.execute(f'''UPDATE breakableContainer SET max_speed_of_car={max_speed_of_car} WHERE num = {num}''') 
-            
-        conn.commit()
-        conn.close() 
         
-    def removebreakableContainer(self,num):
+    
+def containerRemover(num):
+    type_container = input("Enter type of container like 'normal or cold or breakable' : ")
+    if type_container == "normal":
+        conn = sq.connect("Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from Container WHERE num = {num}''')
+        conn.commit()
+        conn.close()  
+        
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Container_Packages WHERE num_Container = {num}''')
+        conn.commit()
+        conn.close()
+        
+    if type_container == "cold":
+        conn = sq.connect("freezerContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE from freezerContainer WHERE num = {num}''')
+        conn.commit()
+        conn.close()  
+        
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Container_Packages WHERE num_Container = {num}''')
+        conn.commit()
+        conn.close()
+        
+    if type_container == "breakable":
         conn = sq.connect("breakableContainer.db")
         cur = conn.cursor()
         cur.execute(f'''DELETE from breakableContainer WHERE num = {num}''')
         conn.commit()
         conn.close()  
-    
-    
-    
         
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Container_Packages WHERE num_Container = {num}''')
+        conn.commit()
+        conn.close()
+    
+def containerEditor(num):
+    conn = sq.connect("Container.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM Container  WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        max_weight , max_package , property = input("Enter max_weight and max_package and  property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+        
+        if max_weight != '0':
+            max_weight = float(max_weight)
+            cur.execute(f'''UPDATE Container SET max_weight = {max_weight} WHERE num = {num}''')
+            
+        if max_package != "0":
+            max_package = int(max_package)
+            cur.execute(f'''UPDATE Continer SET max_package = {max_package} WHERE num = {num}''')
+        
+        if property != '0':
+            cur.execute(f'''UPDATE Container SET proprty = '{property}' WHERE num = {num}''')
+            
+        conn.commit()
+        conn.close()
+        
+    conn = sq.connect("freezerContainer.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM freezerContainer WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        max_weight , max_package , min_temp, property = input("Enter max_weight and max_package and min_temprature of container and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+        if max_weight != '0':
+            max_weight = float(max_weight)
+            cur.execute(f'''UPDATE freezerContainer SET max_weight = {max_weight} WHERE num = {num}''')
+            
+        if max_package != '0':
+            max_package = int(max_package)
+            cur.execute(f'''UPDATE freezerContainer SET max_package = {max_package} WHERE num = {num}''')
+            
+        if min_temp != '0':
+            min_temp = float(min_temp)
+            cur.execute(f'''UPDATE freezerContainer SET min_temp_produced_by_container = {min_temp} WHERE num = {num}''')
+            
+        if property != '0':
+            cur.execute(f'''UPDATE freezerContainer SET property = '{property}' WHERE num = {num}''')
+            
+        conn.commit()
+        conn.close()
+    
+    conn = sq.connect("breakableContainer.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM breakableContainer WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        max_weight , max_package ,max_speed, property = input("Enter max_weight and max_package and max speed of container and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+        if max_weight != '0':
+            max_weight = float(max_weight)
+            cur.execute(f'''UPDATE breakableContainer SET max_weight = {max_weight} WHERE num = {num}''')
+            
+            
+        if max_package != '0':
+            max_package = int(max_package)
+            cur.execute(f'''UPDATE breakableContainer SET max_package = {max_package} WHERE num = {num}''')
+            
+        if max_speed != '0':
+            max_speed = int(max_speed)
+            cur.execute(f'''UPDATE breakableContainer SET max_speed_of_car = {max_speed} WHERE num = {num}''')
+            
+        if property != '0':
+            cur.execute(f'''UPDATE breakableContainer SET property = '{property}' WHERE num = {num}''')
+            
+        conn.commit()
+        conn.close()
         
 class carWithRoom():
     def __init__(self,num,max_weight,max_package,number_of_packages = 0,weight = 0,property = ''):
@@ -455,13 +547,6 @@ class carWithRoom():
         conn.commit()
         conn.close()
         
-    def removecarWithRoom(self,num):
-        conn = sq.connect("carWithRoom.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE from carWithRoom WHERE num = {num}''')
-        conn.commit()
-        conn.close() 
-        
         
 class containerCar():
     def __init__(self,num,max_weight,max_container_can_be_connected,number_of_containers = 0,weight = 0,property = ''):
@@ -504,13 +589,87 @@ class containerCar():
         conn.close() 
         
         
-    def removecontainerCar(self,num):
+
+        
+def carRemover(num):
+    conn = sq.connect("carWithRoom.db")
+    cur = conn.cursor()   
+    cur.execute(f'SELECT * FROM carWithRoom WHERE num={num} ')
+    data = cur.fetchone()
+    if data is not None:
+        conn = sq.connect("carWithRoom.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM carWithRoom WHERE num = {num}''')
+        conn.commit()
+        conn.close()
+        
+        conn = sq.connect("Car_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM Car_Packages WHERE num_carWithRoom = {num}''')
+        conn.commit()
+        conn.close()
+        print("car deleted")
+        
+    conn = sq.connect("containerCar.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM containerCar WHERE num = {num} ''')
+    data = cur.fetchone()
+    if data is not None :
         conn = sq.connect("containerCar.db")
         cur = conn.cursor()
-        cur.execute(f'''DELETE from containerCar WHERE num = {num}''')
+        cur.execute(f'''DELETE FROM containerCar WHERE num = {num}''')
         conn.commit()
-        conn.close()         
-    
+        conn.close()
+        
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''DELETE FROM containerCar_Container WHERE containerCar_num = {num}''')
+        conn.commit()
+        conn.close()
+        print("car deleted")
+        
+    def carEditor(num):
+        conn = sq.connect("carWithRoom.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT * FROM carWithRoom WHERE num = {num}''')
+        data = cur.fetchone()
+        if data is not None :
+            max_weight , max_package , property = input("Enter max_weight and max_package and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+            if max_weight != "0":
+                max_weight = float(max_weight)
+                cur.execute(f'''UPDATE carWithRoom SET max_weight = {max_weight} WHERE num = {num}''')
+                
+            if max_package != '0':
+                max_package = int(max_package)
+                cur.execute(f'''UPDATE carWithRoom SET max_package = {max_package} WHERE num = {num}''')
+                
+            if property != '0':
+                cur.execute(f'''UPDATE carWithRoom SET property = '{property}' WHERE num = {num}''')
+            conn.commit()
+            conn.close()
+        
+        conn = sq.connect("containerCar.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT * FROM containerCar WHERE num = {num}''')
+        data = cur.fetchone()
+        if data is not None:
+            max_weight , max_container , property = input("Enter max_weight and max_container and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+            if max_weight != "0":
+                max_weight = float(max_weight)
+                cur.execute(f'''UPDATE containerCar SET max_weight = {max_weight} WHERE num = {num}''')
+                
+            if max_container != '0':
+                max_container = int(max_container)
+                cur.execute(f'''UPDATE containerCar SET max_container = {max_container} WHERE num = {num}''')
+            
+            if property != '0':
+                cur.execute(f'''UPDATE containerCar SET property = '{property}' WHERE num = {num}''')
+            conn.commit()
+            conn.close()
+                
+                
+                
+                
 def showallPackages(): 
     conn = sq.connect('Packages.db')
     cur = conn.cursor()
@@ -833,7 +992,7 @@ def addContainertoCar(container_num):
                         conn.close()
         
         
-                   #add weight
+                   
 def addPackageToCantainer(container_num):
     
     conn = sq.connect("Container.db")
@@ -1730,9 +1889,11 @@ def showPackages_onTheWay():
                 
                 
                 
-     
-#adders need rework  and remover
+#remover can be work with data checker
+
+# rework  () remover and editor "weights"
 #package tedad when add to container
+# main function 
 
 #__________________________________________________________________
 
