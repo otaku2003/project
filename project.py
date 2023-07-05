@@ -1,4 +1,5 @@
 import sqlite3 as sq
+import sys
 
 def login():
     user = input("Enter username : ")
@@ -628,46 +629,46 @@ def carRemover(num):
         conn.close()
         print("car deleted")
         
-    def carEditor(num):
-        conn = sq.connect("carWithRoom.db")
-        cur = conn.cursor()
-        cur.execute(f'''SELECT * FROM carWithRoom WHERE num = {num}''')
-        data = cur.fetchone()
-        if data is not None :
-            max_weight , max_package , property = input("Enter max_weight and max_package and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
-            if max_weight != "0":
-                max_weight = float(max_weight)
-                cur.execute(f'''UPDATE carWithRoom SET max_weight = {max_weight} WHERE num = {num}''')
-                
-            if max_package != '0':
-                max_package = int(max_package)
-                cur.execute(f'''UPDATE carWithRoom SET max_package = {max_package} WHERE num = {num}''')
-                
-            if property != '0':
-                cur.execute(f'''UPDATE carWithRoom SET property = '{property}' WHERE num = {num}''')
-            conn.commit()
-            conn.close()
-        
-        conn = sq.connect("containerCar.db")
-        cur = conn.cursor()
-        cur.execute(f'''SELECT * FROM containerCar WHERE num = {num}''')
-        data = cur.fetchone()
-        if data is not None:
-            max_weight , max_container , property = input("Enter max_weight and max_container and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
-            if max_weight != "0":
-                max_weight = float(max_weight)
-                cur.execute(f'''UPDATE containerCar SET max_weight = {max_weight} WHERE num = {num}''')
-                
-            if max_container != '0':
-                max_container = int(max_container)
-                cur.execute(f'''UPDATE containerCar SET max_container = {max_container} WHERE num = {num}''')
+def carEditor(num):
+    conn = sq.connect("carWithRoom.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM carWithRoom WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None :
+        max_weight , max_package , property = input("Enter max_weight and max_package and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+        if max_weight != "0":
+            max_weight = float(max_weight)
+            cur.execute(f'''UPDATE carWithRoom SET max_weight = {max_weight} WHERE num = {num}''')
             
-            if property != '0':
-                cur.execute(f'''UPDATE containerCar SET property = '{property}' WHERE num = {num}''')
-            conn.commit()
-            conn.close()
-                
-                
+        if max_package != '0':
+            max_package = int(max_package)
+            cur.execute(f'''UPDATE carWithRoom SET max_package = {max_package} WHERE num = {num}''')
+            
+        if property != '0':
+            cur.execute(f'''UPDATE carWithRoom SET property = '{property}' WHERE num = {num}''')
+        conn.commit()
+        conn.close()
+    
+    conn = sq.connect("containerCar.db")
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM containerCar WHERE num = {num}''')
+    data = cur.fetchone()
+    if data is not None:
+        max_weight , max_container , property = input("Enter max_weight and max_container and property seperated by space (if you dont want change a value place 0 instead of that )  : ").split()
+        if max_weight != "0":
+            max_weight = float(max_weight)
+            cur.execute(f'''UPDATE containerCar SET max_weight = {max_weight} WHERE num = {num}''')
+            
+        if max_container != '0':
+            max_container = int(max_container)
+            cur.execute(f'''UPDATE containerCar SET max_container = {max_container} WHERE num = {num}''')
+        
+        if property != '0':
+            cur.execute(f'''UPDATE containerCar SET property = '{property}' WHERE num = {num}''')
+        conn.commit()
+        conn.close()
+            
+            
                 
                 
 def showallPackages(): 
@@ -1885,10 +1886,295 @@ def showPackages_onTheWay():
                         # cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
                         conn.commit()
                         conn.close()
+       
+def Exit():
+    sys.exit()
+         
+                
+def printMenu():
+    print("1 'add , edit and remove package' ")
+    print("\n2 'add , edit and remove container' ")
+    print("\n3 'add , edit and remove car '")
+    print("\n4 ' Loading '")
+    print("\n5 'Send and receive package '")
+    print("\n6 'Exit '")
+    
+def loadingMenu():
+    print("1 'show packages'")
+    print("\n2 'show containers'")
+    print("\n3 'show cars'")
+    print("\n4 'loading package into container'")
+    print("\n5 'loading package into car with room' ")
+    print("\n6 'loading container into container car'")
+    print("\n7 'Return to the beginning of the program'")
+    print("\n8 'Exit from program'")
+    loading_order = int(input("\nChoose a number from the above numbers : "))
+    if loading_order == 1:
+        showallPackages()
+    if loading_order == 2:
+        showallcontainers()
+    if loading_order == 3:
+        showallCars()
+    if loading_order == 4:
+        container_num = int(input("Enter container number : "))
+        addPackageToCantainer(container_num)
+        print("package added to container")
+        loadingMenu()
+        
+    if loading_order == 5:
+        car_num = int(input("Enter car number : "))
+        addPackageTocarWithRoom(car_num)
+        print("package added into car with room")
+        loadingMenu()
+    
+    if loading_order == 6:
+        container_num = int(input("Enter container number : ")) 
+        addContainertoCar(container_num)
+        print("container added into car")
+        loadingMenu()
+        
+    if loading_order == 7:
+        main()
+        
+    if loading_order == 8:
+        Exit()
+    
+    else: print("wrong number ") ; loadingMenu()
+    
+    
+    
+def sendAndReceiveMenu():
+    print("1 'show packages in the way'")
+    print("\n2 'issuing and save and show waybill'")
+    print("\n3 'Return to the beginning of the program'")
+    print("\n4 'Exit program'")
+    order = int(input("Choose a number from the above numbers : "))
+    
+    if order ==1 :
+        showPackages_onTheWay()
+        print("task done")
+        sendAndReceiveMenu()
+        
+    if order ==2:
+        export_waybill()
+        print("task done")
+        sendAndReceiveMenu()
+        
+    if order == 3:
+        main()
+        
+    if order ==4:
+        Exit()
+    
+    
+def main():
+    printMenu()
+    order = int(input("Choose a number from the above numbers : "))
+    if order == 1:
+        print("1 'add package'")
+        print("\n2 'edit package'")
+        print("\n3 'remove package'")
+        package_order = int(input("Choose a number from the above numbers : "))
+        if package_order == 1:
+            print("1 'add normal package'")
+            print("\n2 'add cold package'")
+            print("\n3 'add breakable package'")
+            package_type_order = int(input("\nChoose a number from the above numbers : "))
+            if package_type_order == 1:
+                number , weight , destination , beginning = input("\nEnter 'number' and 'weight' and 'destination' and 'beginning' separated by space : ").split()
+                weight = float(weight) ; number = int(number)
+                x1 = Package(number,weight,destination,beginning)
+                print("package added")
+                main()
+                
+            elif package_type_order == 2:
+                number , weight , destination, beginning ,min_temp  = input("\nEnter 'number' and 'weight' and 'destination' and 'beginning' and 'min temprature' separated by space : ").split()
+                property = input("enter property if package has property else leave it blank :  ")
+                weight = float(weight) ; min_temp = float(min_temp) ; number = int(number)
+                if property != "":
+                    x2 = coldPackage(number, weight , destination , beginning , min_temp , property)
+                    print("package added")
+                    main()
+                else:
+                    x2 = coldPackage(number, weight , destination , beginning , min_temp)
+                    print("package added")
+                    main()
+                
+            elif package_type_order == 3 :
+                number , weight , destination, beginning = input("\nEnter 'number' and 'weight' and 'destination' and 'beginning'  separated by space : ").split()
+                property = input("enter property if package has property else leave it blank :  ")
+                weight = float(weight) ; number = int(number)
+                if property != "":
+                    x3 = breakablePackage(number,weight,destination,beginning,property)
+                    print("package added")
+                    main()
+                else:
+                    x3 = breakablePackage(number,weight,destination,beginning)
+                    print("package added")
+                    main()
+            
+            else:
+                print("wrong number")
+                main()
+        
+        elif package_order == 2:
+            package_num = int(input("Enter package number : "))
+            packageEditor(package_num)
+            print("package edited")
+            main()
+            
+            
+            
+        elif package_order == 3:
+            package_num = int(input("Enter package number : "))
+            packageRemover(package_num)
+            print("package removed")
+            main()
+        
+        else:
+            print("wrong number")
+            main()   
+
+
+    elif order ==2:
+        print("1 'add container'")
+        print("\n2 'edit container'")
+        print("\n3 'remove container'")
+        container_order = int(input("\nChoose a number from the above numbers : "))
+        
+        if container_order == 1:
+            print("1 'add normal container'")
+            print("\n2 'add freezer container'")
+            print("\n3 'add container for breakable packages '")
+            container_type_order = int(input("\nChoose a number from the above numbers : "))
+            if container_type_order == 1:
+                number , max_weight , max_package = input("\nEnter 'number' and 'max weight' and 'max package' separated by space : ").split()
+                property = input("enter property if container has property else leave it blank :  ")
+                number = int(number) ; max_weight = float(max_weight) ; max_package = int(max_package)
+                if property != '':
+                    x1 = Container(number,max_weight,max_package,property=property)
+                    print("container added")
+                    main()
+                else:
+                    x2 = Container(number,max_weight,max_package)
+                    print("container added")
+                    main()
                 
                 
                 
+            elif container_type_order ==2:
+                number , max_weight , max_package , min_temp = input("\nEnter 'number' and 'max weight' and 'max package'and 'min temperatue' separated by space : ").split()
+                property = input("enter property if container has property else leave it blank :  ")
+                number = int(number) ; max_weight = float(max_weight) ; max_package = int(max_package) ; min_temp = float(min_temp)
+                if property != "":
+                    x1 = freezerContainer(number,max_weight,max_package,min_temp,property=property)
+                    print("container added")
+                    main()
+                else:
+                    x1 = freezerContainer(number,max_weight,max_package,min_temp)
+                    print("container added")
+                    main()
                 
+            elif container_type_order ==3:
+                number , max_weight , max_package , max_speed = input("\nEnter 'number' and 'max weight' and 'max package'and 'max speed' separated by space : ").split()
+                property = input("enter property if container has property else leave it blank :  ")
+                number = int(number) ; max_weight = float(max_weight) ; max_speed = int(max_speed)
+                if property != "":
+                    x1 = breakableContainer(number,max_weight,max_package,max_speed,property=property)
+                    print("container added")
+                    main()
+                else:
+                    x1 = breakableContainer(number,max_weight,max_package,max_speed)
+                    print("container added")
+                    main()
+        
+        elif container_order == 2:
+            container_num = int(input("Enter container number : "))
+            containerEditor(container_num)
+            print("container edited")
+            main()
+            
+        elif container_order == 3:
+            container_num = int(input("Enter container number : "))
+            containerRemover(container_num)
+            print("container removed")
+            main()
+            
+        else:
+            print("wrong number")
+            main()
+            
+        
+    elif order ==3 :
+        print("1 'add car'")
+        print("\n2 'edit car'")
+        print("\n3 'remove car'")
+        car_order = int(input("\nChoose a number from the above numbers : "))
+        if car_order == 1:
+            print("1 'add car with room'")
+            print("\n2 'add container car'")
+            car_type_order = int(input("\nChoose a number from the above numbers : "))
+            if car_type_order == 1 :
+                number , max_weight , max_package = input("\nEnter 'number' and 'max weight' and 'max package' separated by space : ").split()
+                property = input("enter property if car has property else leave it blank :  ")
+                number = int(number) ; max_weight = float(max_weight) ; max_package = int(max_package)
+                if property != "":
+                    x3 = carWithRoom(number,max_weight,max_package,property=property)
+                    print("car added")
+                    main()
+                    
+                else:
+                    x3 = carWithRoom(number,max_weight,max_package)
+                    print("car added")
+                    main()
+                
+            if car_type_order == 2 :
+                number , max_weight , max_container = input("\nEnter 'number' and 'max weight' and 'max container' separated by space : ").split()
+                property = input("enter property if car has property else leave it blank :  ")
+                number = int(number) ; max_weight = float(max_weight) ; max_container = int(max_container)
+                if property != "":
+                    x2 = containerCar(number,max_weight,max_container,property=property)
+                    print("car added")
+                    main()
+            
+            else:print('wrong number'); main()
+            
+        elif car_order == 2:
+            car_num = int(input("Enter car number : "))
+            carEditor(car_num)
+            print("car edited")
+            main()
+
+                     
+            
+        elif car_order == 3:
+            car_num = int(input("Enter car number : "))
+            carRemover(car_num)
+            print("car deleted")
+            main()
+         
+        else:print("wrong number") ; main()   
+        
+    elif order == 4 :
+        loadingMenu()
+ 
+            
+            
+        
+            
+        
+        
+    elif order == 5:
+        sendAndReceiveMenu()
+        
+    elif order ==6:
+        Exit()
+        
+    else:
+        print("wrong number")
+        main()
+
+                 
 #remover can be work with data checker
 
 # rework  () remover and editor "weights"
@@ -1944,3 +2230,5 @@ def showPackages_onTheWay():
 
 # showPackages_onTheWay()
 #____________________________________
+
+main()
