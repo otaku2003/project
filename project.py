@@ -150,18 +150,67 @@ def packageRemover(num):
     cur.execute(f'SELECT * FROM Packages WHERE num={num} ')
     data = cur.fetchone()
     if data is not None:
+        
+        
         conn = sq.connect("Packages.db")
         cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM Packages WHERE num = {num} ''')
+        package_weight = cur.fetchone()
         cur.execute(f'''DELETE FROM Packages WHERE num = {num}''')
         conn.commit()
         conn.close()
         
         conn = sq.connect("Container_Packages.db")
         cur = conn.cursor()
-        cur.execute(f'''DELETE FROM Container_Packages WHERE num_package = {num}''')
-        conn.commit()
-        conn.close()
-        print("package deleted")
+        cur.execute(f'''SELECT num_Container FROM Container_Packages WHERE num_package = {num}''')
+        container_num = cur.fetchone()
+        if container_num is not None:
+        
+            conn = sq.connect("Container.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM Contaienr WHERE num = {container_num[0]} ''')
+            container_weight = cur.fetchone()
+            conn.close()
+
+            conn = sq.connect("Container.db")
+            cur = conn.cursor()
+            cur.execute(f'''UPDATE Container SET weight = {container_weight[0]- package_weight[0]}''')
+            conn.commit()
+            conn.close()
+
+            conn = sq.connect("Container_Packages.db")
+            cur = conn.cursor()
+            cur.execute(f'''DELETE FROM Container_Packages WHERE num_package = {num}''')
+            conn.commit()
+            conn.close()
+            print("package deleted")
+            
+        conn = sq.connect("Car_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT num_carWithRoom FROM Car_Packages WHERE num_package = {num} ''')
+        carwithroom_num = cur.fetchone()
+        if carwithroom_num is not None:
+            
+            conn = sq.connect("carWithRoom.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM carWithRoom WHERE num = {carwithroom_num[0]} ''')
+            carwithroom_weight = cur.fetchone()
+            conn.close()
+            
+            conn = sq.connect("carWithRoom.db")
+            cur = conn.cursor()
+            cur.execute(f'''UPDATE carWithRoom SET weight = {carwithroom_weight[0]- package_weight[0]}''')
+            conn.commit()
+            conn.close()
+            
+            conn = sq.connect("Car_Packages.db")
+            cur = conn.cursor()
+            cur.execute(f'''DELETE FROM Car_Packages WHERE num_packages = {num}''')
+            conn.commit()
+            conn.close()
+            print("package deleted")
+            
+            
         
     conn = sq.connect("coldPackages.db")
     cur = conn.cursor()   
@@ -171,9 +220,29 @@ def packageRemover(num):
     if data is not None:
         conn = sq.connect("coldPackages.db")
         cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM coldPackages WHERE num = {num} ''')
+        package_weight = cur.fetchone()
         cur.execute(f'''DELETE FROM coldPackages WHERE num = {num}''')
         conn.commit()
         conn.close()
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT num_Container FROM Container_Packages WHERE num_package = {num}''')
+        container_num = cur.fetchone()
+        
+        conn = sq.connect("freezerContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM freezerContaienr WHERE num = {container_num[0]} ''')
+        container_weight = cur.fetchone()
+        
+        conn = sq.connect("freezerContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''UPDATE freezerContainer SET weight = {container_weight[0]- package_weight[0]}''')
+        conn.commit()
+        conn.close()
+        
+        
         
         conn = sq.connect("Container_Packages.db")
         cur = conn.cursor()
@@ -191,9 +260,30 @@ def packageRemover(num):
     if data is not None:
         conn = sq.connect("breakablePackages.db")
         cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM breakablePackages WHERE num = {num} ''')
+        package_weight = cur.fetchone()
         cur.execute(f'''DELETE FROM breakablePackages WHERE num = {num}''')
         conn.commit()
         conn.close()
+        
+        
+        
+        conn = sq.connect("Container_Packages.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT num_Container FROM Container_Packages WHERE num_package = {num}''')
+        container_num = cur.fetchone()
+        
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM breakableContaienr WHERE num = {container_num[0]} ''')
+        container_weight = cur.fetchone()
+        
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''UPDATE breakableContainer SET weight = {container_weight[0]- package_weight[0]}''')
+        conn.commit()
+        conn.close()
+        
         
         conn = sq.connect("Container_Packages.db")
         cur = conn.cursor()
@@ -214,12 +304,16 @@ def packageEditor(num):
         conn = sq.connect("Packages.db")
         cur = conn.cursor()
         if weight != "0":
+            conn = sq.connect("Packages.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM Packages WHERE num = {num}''')
+            package_first_weight = cur.fetchone()
+
             weight = float(weight)
             cur.execute(f'''UPDATE Packages SET weight={weight} WHERE num = {num}''') 
             conn.commit()
             conn.close() 
               
-            
             conn = sq.connect("Container_Packages.db")
             cur = conn.cursor()
             cur.execute(f'''SELECT num_Container FROM Container_Packages WHERE num_package = {num}''')
@@ -231,9 +325,25 @@ def packageEditor(num):
                 cur.execute(f'''SELECT weight FROM Container WHERE num = {container_num[0]}''')
                 container_weight = cur.fetchone()
                 
-                cur.execute(f'''UPDATE Container SET weight = {weight+container_weight[0]}''')
+                
+                cur.execute(f'''UPDATE Container SET weight = {weight + container_weight[0] - package_first_weight[0]} WHERE num = {container_num[0]}''')
                 conn.commit()
                 conn.close()
+                
+                conn = sq.connect("containerCar_Container.db")
+                cur = conn.cursor()
+                cur.execute(f'''SELECT containerCar_num FROM containerCar_Container WHERE Container_num = {container_num[0]}''')
+                containercar_num = cur.fetchone()
+                
+                if containercar_num is not None:
+                    conn = sq.connect("containerCar.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containercar_num[0]} ''')
+                    containercar_weight = cur.fetchone()
+                    
+                    cur.execute(f'''UPDATE containerCar SET weight = {weight + containercar_weight[0] - package_first_weight[0]}''')
+                    conn.commit()
+                    conn.close()
                 
             
         conn = sq.connect("Packages.db")
@@ -256,7 +366,17 @@ def packageEditor(num):
          
         if weight != "0":
             weight = float(weight)
+            conn = sq.connect("coldPackages.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM coldPackages WHERE num = {num}''')
+            package_first_weight = cur.fetchone()
+            
+            conn = sq.connect("coldPackages.db")
+            cur = conn.cursor()
             cur.execute(f'''UPDATE coldPackages SET weight={weight} WHERE num = {num}''') 
+            conn.commit()
+            conn.close()
+            
             
             conn = sq.connect("Container_Packages.db")
             cur = conn.cursor()
@@ -269,9 +389,26 @@ def packageEditor(num):
                 cur.execute(f'''SELECT weight FROM freezerContainer WHERE num = {container_num[0]}''')
                 container_weight = cur.fetchone()
                 
-                cur.execute(f'''UPDATE freezerContainer SET weight = {weight+container_weight[0]}''')
+                cur.execute(f'''UPDATE freezerContainer SET weight = {weight + container_weight[0] - package_first_weight[0]} WHERE num = {container_num[0]}''')
                 conn.commit()
                 conn.close()
+                
+                conn = sq.connect("containerCar_Container.db")
+                cur = conn.cursor()
+                cur.execute(f'''SELECT containerCar_num FROM containerCar_Container WHERE Container_num = {container_num[0]}''')
+                containercar_num = cur.fetchone()
+                
+                if containercar_num is not None :
+                    conn = sq.connect("containerCar.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containercar_num[0]} ''')
+                    containercar_weight = cur.fetchone()
+                    
+                    cur.execute(f'''UPDATE containerCar SET weight = {weight + containercar_weight[0] - package_first_weight[0]}''')
+                    conn.commit()
+                    conn.close()
+                
+                    
             
         if destination != "0":
             cur.execute(f'''UPDATE coldPackages SET destination='{destination}' WHERE num = {num}''')
@@ -299,7 +436,15 @@ def packageEditor(num):
         
         if weight != "0":
             weight = float(weight)
-            cur.execute(f'''UPDATE coldPackages SET weight={weight} WHERE num = {num}''') 
+            
+            conn = sq.connect("breakablePackages.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM breakablePackages WHERE num = {num}''')
+            package_first_weight = cur.fetchone()
+            
+            cur.execute(f'''UPDATE breakablePackages SET weight={weight} WHERE num = {num}''') 
+            conn.commit()
+            conn.close()
             
             
             conn = sq.connect("Container_Packages.db")
@@ -313,9 +458,26 @@ def packageEditor(num):
                 cur.execute(f'''SELECT weight FROM breakableContainer WHERE num = {container_num[0]}''')
                 container_weight = cur.fetchone()
                 
-                cur.execute(f'''UPDATE breakableContainer SET weight = {weight+container_weight[0]}''')
+                cur.execute(f'''UPDATE breakableContainer SET weight = {weight + container_weight[0] - package_first_weight[0]}''')
                 conn.commit()
                 conn.close()
+                
+                conn = sq.connect("containerCar_Container.db")
+                cur = conn.cursor()
+                cur.execute(f'''SELECT containerCar_num FROM containerCar_Container WHERE Container_num = {container_num[0]}''')
+                containercar_num = cur.fetchone()
+                if containercar_num is not None:
+                    conn = sq.connect("containerCar.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containercar_num[0]} ''')
+                    containercar_weight = cur.fetchone()
+                    
+                    cur.execute(f'''UPDATE containerCar SET weight = {weight + containercar_weight[0] - package_first_weight[0]}''')
+                    conn.commit()
+                    conn.close()
+                
+                
+                
             
         if destination != "0":
             cur.execute(f'''UPDATE coldPackages SET destination='{destination}' WHERE num = {num}''')
@@ -461,15 +623,42 @@ def containerRemover(num):
     if data is not None:
         conn = sq.connect("Container.db")
         cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM Container WHERE num = {num}''')
+        container_weight = cur.fetchone()
+        
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT containerCar_num FROM containerCar_Container WHERE Container_num = {num}''')
+        containercar_num = cur.fetchone()
+        
+        if containercar_num is not None:
+        
+        
+            conn = sq.connect("containerCar.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containercar_num[0]} ''')
+            containercar_weight = cur.fetchone()
+            
+            cur.execute(f'''UPDATE containerCar SET weight = {containercar_weight[0] - container_weight[0]} WHERE num = {containercar_num[0]}''')
+            conn.commit()
+            conn.close()
+            
+            
+            
+            conn = sq.connect("containerCar_Container.db")
+            cur = conn.cursor()
+            cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
+            conn.commit()
+            conn.close()
+        
+        
+        
+        conn = sq.connect("Container.db")
+        cur = conn.cursor()
         cur.execute(f'''DELETE from Container WHERE num = {num}''')
         conn.commit()
         conn.close()  
         
-        conn = sq.connect("containerCar_Container.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
-        conn.commit()
-        conn.close()
         
         conn = sq.connect("Container_Packages.db")
         cur = conn.cursor()
@@ -486,15 +675,41 @@ def containerRemover(num):
     if data is not None:
         conn = sq.connect("freezerContainer.db")
         cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM freezerContainer WHERE num = {num}''')
+        container_weight = cur.fetchone()
+        
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT containerCar_num FROM containerCar_Container WHERE Container_num = {num}''')
+        containercar_num = cur.fetchone()
+        
+        if containercar_num is not None:
+            
+            
+            conn = sq.connect("containerCar.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containercar_num[0]} ''')
+            containercar_weight = cur.fetchone()
+            
+            cur.execute(f'''UPDATE containerCar SET weight = {containercar_weight[0] - container_weight[0]} WHERE num = {containercar_num[0]}''')
+            conn.commit()
+            conn.close()
+            
+            
+            conn = sq.connect("containerCar_Container.db")
+            cur = conn.cursor()
+            cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
+            conn.commit()
+            conn.close()
+        
+            
+        
+        conn = sq.connect("freezerContainer.db")
+        cur = conn.cursor()
         cur.execute(f'''DELETE from freezerContainer WHERE num = {num}''')
         conn.commit()
         conn.close()  
         
-        conn = sq.connect("containerCar_Container.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
-        conn.commit()
-        conn.close()
         
         conn = sq.connect("Container_Packages.db")
         cur = conn.cursor()
@@ -509,17 +724,44 @@ def containerRemover(num):
     cur.execute(f'SELECT * FROM breakableContainer WHERE num={num} ')
     data = cur.fetchone()
     if data is not None:
+        
+        conn = sq.connect("breakableContainer.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT weight FROM breakableContainer WHERE num = {num}''')
+        container_weight = cur.fetchone()
+        
+        
+        conn = sq.connect("containerCar_Container.db")
+        cur = conn.cursor()
+        cur.execute(f'''SELECT containerCar_num FROM containerCar_Container WHERE Container_num = {num}''')
+        containercar_num = cur.fetchone()
+        
+        if containercar_num is not None:
+            
+            conn = sq.connect("containerCar.db")
+            cur = conn.cursor()
+            cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containercar_num[0]} ''')
+            containercar_weight = cur.fetchone()
+            
+            cur.execute(f'''UPDATE containerCar SET weight = {containercar_weight[0] - container_weight[0]} WHERE num = {containercar_num[0]}''')
+            conn.commit()
+            conn.close()
+            
+            
+            conn = sq.connect("containerCar_Container.db")
+            cur = conn.cursor()
+            cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
+            conn.commit()
+            conn.close()
+            
+        
+        
         conn = sq.connect("breakableContainer.db")
         cur = conn.cursor()
         cur.execute(f'''DELETE from breakableContainer WHERE num = {num}''')
         conn.commit()
         conn.close()  
         
-        conn = sq.connect("containerCar_Container.db")
-        cur = conn.cursor()
-        cur.execute(f'''DELETE FROM containerCar_Container WHERE Container_num = {num}''')
-        conn.commit()
-        conn.close()
         
         conn = sq.connect("Container_Packages.db")
         cur = conn.cursor()
@@ -620,6 +862,7 @@ class carWithRoom():
         cur.execute(f'SELECT 1 FROM containerCar WHERE num={num} ')
         data = cur.fetchone()
         conn.commit()
+        conn.close()
         if data is not None:
             print("this number exists in container Cars")
         
@@ -659,7 +902,7 @@ class containerCar():
         data = cur.fetchone()
         if data is not None:
             print("this number exists in container Cars")
-         
+        conn.close()
                
         conn = sq.connect("carWithRoom.db")
         cur = conn.cursor() 
@@ -799,7 +1042,8 @@ def showallcontainers():
     print("normal container\n number - max_waight - max_package - current number of packages in container - current weight - property")
     for row in cur.execute('''SELECT * FROM Container '''):
         print(row)
-        
+    
+    conn.close()
     conn = sq.connect('freezercontainer.db')
     cur = conn.cursor()
     print('freezer containers\n number - max_weight - max_package - min temperature container can produce - current number of packages in container - weight - property')
@@ -825,7 +1069,7 @@ def showallCars():
     print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ")
     for row in cur.execute('''SELECT * FROM containerCar '''):
         print(row)              
-
+    conn.close()
         
 def addPackageTocarWithRoom(car_num):
     conn = sq.connect("carWithRoom.db")
@@ -918,7 +1162,7 @@ def addPackageTocarWithRoom(car_num):
                                 conn.commit()
                                 conn.close()                  
 
-
+####
 def addContainertoCar(container_num):
     
     conn = sq.connect("containerCar_Container.db")
@@ -929,6 +1173,7 @@ def addContainertoCar(container_num):
     data = cur.fetchone()
     if data is not None:
         print("Container is already connected in another car")
+        conn.close()
     else:
     
         conn = sq.connect("Container.db")
@@ -946,7 +1191,8 @@ def addContainertoCar(container_num):
             print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ") 
             for row in cur.execute(f"SELECT * FROM containerCar "):
                 print(row)     
-                
+            
+            conn.close()
                 
             input_string = input("enter numbers seperated by space :")
             containerCar_num_list = input_string.split()
@@ -959,30 +1205,46 @@ def addContainertoCar(container_num):
                 cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containerCar_num}''')  
                 for row in cur:
                     containerCar_weight = row    
+                    
+                conn.close()
 
+                conn = sq.connect("containerCar.db")
+                cur = conn.cursor() 
                 cur.execute(f'''SELECT max_weight FROM containerCar WHERE num = {containerCar_num}''') 
                 for row in cur:
                     max_weight_containerCar = row   
 
+                conn.close()
+                
                 if(max_weight_containerCar[0]< containerCar_weight[0]+container_weight[0]):
                     print(f"By adding  container {containerCar_num}, the weight of the container car exceeds its limit")
 
                 else:
+                    conn = sq.connect("containerCar.db")
+                    cur = conn.cursor() 
                     cur.execute(f'''SELECT number_of_containers FROM containerCar WHERE num = {containerCar_num}''')
                     for row in cur:
                         number_of_containers_in_car = row
 
+                    conn.close()
+                    
+                    conn = sq.connect("containerCar.db")
+                    cur = conn.cursor() 
                     cur.execute(f'''SELECT max_container_can_be_connected FROM containerCar WHERE num = {containerCar_num}''')
                     for row in cur:
                         max_number_of_container_in_car = row
-
+                    conn.close()
                     if(number_of_containers_in_car>=max_number_of_container_in_car):
                         print(f"The capacity of the vehicle for the container {containerCar_num} is complete")
 
                     else:
+                        
                         conn = sq.connect('containerCar.db')
                         cur = conn.cursor()
                         cur.execute(f'''UPDATE containerCar SET weight ={containerCar_weight[0]+ container_weight[0]} , number_of_containers = {number_of_containers_in_car[0]+1} WHERE num={containerCar_num}''')
+                        conn.commit()
+                        conn.close()
+                        
                         conn = sq.connect("containerCar_Container.db")
                         cur = conn.cursor()
     
@@ -990,6 +1252,7 @@ def addContainertoCar(container_num):
                         cur.execute(f'''INSERT OR IGNORE INTO containerCar_Container VALUES ({container_num},{containerCar_num},'normal')''')
                         conn.commit()
                         conn.close()
+        conn.close()
                         
         conn = sq.connect("freezerContainer.db")
         cur = conn.cursor()   
@@ -1005,7 +1268,7 @@ def addContainertoCar(container_num):
             print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ") 
             for row in cur.execute(f"SELECT * FROM containerCar "):
                 print(row)     
-                
+            conn.close()  
             input_string = input("enter numbers seperated by space :")
             containerCar_num_list = input_string.split()
             for i in range(len(containerCar_num_list)):
@@ -1060,7 +1323,7 @@ def addContainertoCar(container_num):
             print("container cars\n number - max_weight - max_containers _ current number of containers - weight - property ") 
             for row in cur.execute(f"SELECT * FROM containerCar "):
                 print(row)     
-            
+            conn.close()
             input_string = input("enter numbers seperated by space :")
             containerCar_num_list = input_string.split()
             for i in range(len(containerCar_num_list)):
@@ -1068,7 +1331,9 @@ def addContainertoCar(container_num):
             
             for containerCar_num in containerCar_num_list:                
  
-            
+ 
+                conn = sq.connect("containerCar.db")
+                cur = conn.cursor()
                 cur.execute(f'''SELECT weight FROM containerCar WHERE num = {containerCar_num}''')  
                 for row in cur:
                     containerCar_weight = row    
@@ -1100,7 +1365,7 @@ def addContainertoCar(container_num):
                         cur.execute(f'''INSERT OR IGNORE INTO containerCar_Container VALUES ({container_num},{containerCar_num},'breakable')''')
                         conn.commit()
                         conn.close()
-        
+    conn.close()
         
                    
 def addPackageToCantainer(container_num):
@@ -1109,6 +1374,7 @@ def addPackageToCantainer(container_num):
     cur = conn.cursor()   
     cur.execute(f'SELECT 1 FROM Container WHERE num={container_num} ')
     data = cur.fetchone()
+    conn.close()
     if data is not None:
         conn = sq.connect("Container.db")
         cur = conn.cursor()
@@ -1131,13 +1397,16 @@ def addPackageToCantainer(container_num):
                 max_container_weight = row
             if(Container_weight[0]>=max_container_weight[0]):
                 print("The weight capacity of the container is complete")
+            
             else:
+                conn.close()
                 conn = sq.connect('Packages.db')
                 cur = conn.cursor()
                 print("normal packages\nnumber - weight - destination - beginning") 
                 for row in cur.execute('''SELECT * FROM Packages '''):
                     print(row)
-                    
+                
+                conn.close()  
                 input_string = input("enter numbers seperated by space :")
                 package_num_list = input_string.split()
                 for i in range(len(package_num_list)):
@@ -1148,7 +1417,9 @@ def addPackageToCantainer(container_num):
                 
                     conn = sq.connect("Container_Packages.db")
                     cur = conn.cursor()
+                    cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
                     cur.execute(f"SELECT 1 FROM Container_packages WHERE num_package = {package_num}")
+                    conn.commit()
                     data=cur.fetchone()
                     if data is not None:
                         print(f"package {package_num} is already exist in a container")
@@ -1156,7 +1427,9 @@ def addPackageToCantainer(container_num):
                     else:
                         conn = sq.connect("Car_Packages.db")
                         cur = conn.cursor()
+                        cur.execute('''CREATE TABLE IF NOT EXISTS Car_Packages (num_package int PRIMARY KEY , num_carWithRoom int, type_Package text, type_carWithRoom text)''')
                         cur.execute(f"SELECT 1 FROM Car_packages WHERE num_package = {package_num}")
+                        conn.commit()
                         data=cur.fetchone()
                         if data is not None:
                             print(f"package {package_num} is already exist in a car with room")
@@ -1417,7 +1690,7 @@ def export_waybill():
     for i in containerCar_keys:
         for row in cur.execute(f'''SELECT * FROM containerCar WHERE num = {i[0]}'''):
             print(row)    
-            
+    conn.close()     
     input_string = input("enter numbers seperated by space :")
     car_num_list = input_string.split()
     for i in range(len(car_num_list)):
@@ -1496,6 +1769,7 @@ def export_waybill():
         cur = conn.cursor()   
         cur.execute(f'SELECT * FROM containerCar WHERE num={car_num} ')
         data = cur.fetchone()
+        conn.close()
         if data is not None: 
             conn = sq.connect('containerCar_Container.db')
             cur = conn.cursor()
@@ -1561,6 +1835,7 @@ def export_waybill():
                         container = cur.fetchone()
                         
                         cur.execute(f'''DELETE FROM Container WHERE num = {container_key[0]}''')
+                        conn.close()
                         
                         conn = sq.connect("waybill.db")
                         cur = conn.cursor()
@@ -1846,7 +2121,7 @@ def showPackages_onTheWay():
                 cur.execute(f'''SELECT * FROM containerCar WHERE num = {containerCar_num[0]}''')
                 containerCar = cur.fetchone()
                 
-                cur.execute(f'''DELETE FROM containerCar WHERE num = {container_num[0]}''')
+                cur.execute(f'''DELETE FROM containerCar WHERE num = {containerCar_num[0]}''')
                 conn.commit()
                 conn.close()
                 
@@ -1864,6 +2139,13 @@ def showPackages_onTheWay():
                     
                     cur.execute(f'DELETE  FROM Container WHERE num = {container_i[0]}')
                     conn.commit()
+                    conn.close()
+                    
+                    conn = sq.connect("waybill.db")
+                    cur = conn.cursor()
+                    cur.execute(f'''DELETE FROM container_incontainerCar WHERE container_num = {container_i[0]}''')
+                    conn.commit()
+                    conn.close()
                     
                     if container is not None:
                         conn = sq.connect("Container.db")
@@ -1878,6 +2160,7 @@ def showPackages_onTheWay():
                     packages_num_incontainer_list = cur.fetchall()
                     cur.execute(f'''DELETE FROM packages_inContainer WHERE num_container = {container_i[0]}''')
                     conn.commit()
+                    conn.close()
                     
 
                     for package_i in packages_num_incontainer_list:
@@ -2352,72 +2635,4 @@ start()
 
  
 
-
-# rework  () remover and editor "weights"
-
-#__________________________________________________________________
-
-
-# x1 = Package(5,10,'a','b')
-# x2 = Container(5,1000,1000,)
-# x3 = containerCar(5,1500,5,)
-
-# addPackageToCantainer(5)
-# addContainertoCar(5)
-
-
-# x1 = Package(40,40,'z','a')
-# x2 = carWithRoom(40,500,9,)
-# addPackageTocarWithRoom(40)
-
-
-# export_waybill()
-
-# showPackages_onTheWay()
-
-
-
-# x1 = coldPackage(70,6,'g','t',10)
-# x2 = coldPackage(71,3,'d','t',9)
-# x3 = coldPackage(72,2,'i','y',6)
-# x4 = coldPackage(73,3,'o','w',3)
-
-# x5 = freezerContainer(70,1000,100,0)
-# x6 = freezerContainer(71,1001,60,0)
-
-# x7 = containerCar(70,9000,9)
- 
-# addPackageToCantainer(70)
-# addPackageToCantainer(71)
-
-# addContainertoCar(71)
-# addContainertoCar(70)
-
-# export_waybill()
-
-
-# showPackages_onTheWay()
-#____________________________________
-
-# main()
-
-# x1 = breakablePackage(30,3,'sd','sw')
-# x2 = breakablePackage(31,4,'e','op')
-# x3 = breakablePackage(32,5,'iy',"slk")
-# x4 = breakablePackage(34,6,"we","idf")
-
-# x1 = breakableContainer(30,1500,90,100)
-# x2 = breakableContainer(31,1700,80,100)
-
-# x5 = containerCar(30,9000,80)
-
-# addContainertoCar(30)
-# addContainertoCar(31)
-
-# addPackageToCantainer(30)
-# addPackageToCantainer(31)
-
-# export_waybill()
-
-# showPackages_onTheWay()
 
