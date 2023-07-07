@@ -1507,8 +1507,11 @@ def addPackageToCantainer(container_num):
                 
                     conn = sq.connect("Container_Packages.db")
                     cur = conn.cursor()   
+                    cur.execute('''CREATE TABLE IF NOT EXISTS Container_Packages (num_package int PRIMARY KEY , num_Container int, type_Package text, type_Container text)''')
                     cur.execute(f'SELECT 1 FROM Container_Packages WHERE num_package={package_num} ')
+                    conn.commit()
                     data = cur.fetchone()
+                    
                     if data is not None:
                         print(f"package {package_num} is already exist in a container")
 
